@@ -1,125 +1,124 @@
 # pi-grail
 
-Minimal extension bootstrap for the **released Pi CLI** and TypeSafe Jev. Uses
-the official `@typesafe-ai/sdk` directly. It does not depend on `pi-jev`, review
-workers automatically, select signals, intercept tools, or modify either Pi or
-pi-subagents. API calls happen only when explicitly requested.
+POC extension for released Pi 0.87.1 and pi-subagents 0.71.0. Jev and a generic
+LLM gate decide when a shared reviewer should investigate worker activity.
+[PLAN.md](PLAN.md) is the approved scope; [HANDOFF.md](HANDOFF.md) is historical context.
 
-## Setup
-
-Requires Node.js 22.19+ and a production Pi install:
+## Setup and iteration
 
 ```sh
 npm install -g --ignore-scripts @earendil-works/pi-coding-agent@0.87.1
 npm ci --ignore-scripts
-npm run link
 pi install npm:pi-subagents@0.71.0
+npm run link
+npm run dev -- --grail-selector jev
+# Alternative gate:
+npm run dev -- --grail-selector subagent
 ```
 
-`npm run link` registers this checkout's absolute path in Pi's personal settings.
-Pi reads source files from here rather than a copied package. After editing,
-use `/reload` in an interactive Pi session or restart it. TypeScript extensions
-load directly, without a build step. `npm run dev`, `npm run pi:status`, and the
-CLI smoke test resolve the **global production binary**, bypassing npm's local
-`node_modules/.bin/pi`. The dev dependency is the same released version and is
-present for types, not a Pi fork.
+Pi loads this checkout directly. Use `/reload` after edits, or restart Pi. There
+is no build step or fork. Scripts resolve the global production Pi binary;
+the local dependency supplies matching types. Reference clones under /tmp are not used.
 
-Project trust: `npm run dev` approves this checkout's project resources for that
-invocation, including `.pi/agents/grail-reviewer.md`. Ordinary `pi` prompts for
-trust when needed. The reviewer persona is available to pi-subagents but is not
-automatically dispatched. It uses your normal configured subagent model.
+Jev reads TYPESAFE_API_KEY from the ignored, owner-only .env in this checkout,
+or a key installed by `npm run jev:auth`. Environment values take precedence.
+OpenRouter uses Pi's normal auth store (`npm run pi:auth`) or OPENROUTER_API_KEY.
+Never commit credentials.
 
-## Configure Jev
+The gate pins jev-1.13.0; generative children default to
+openrouter/deepseek/deepseek-v4.1-flash, thinking low. Override with
+--grail-model and --grail-thinking. Keep these fixed across comparisons.
+Raw /jev calls can select another model independently.
 
-Create a key at <https://console.typesafe.ai/settings/keys>, then run in your own
-terminal:
-
-```sh
-npm run jev:auth
-npm run jev:models
-npm run jev:test
-```
-
-Input is hidden. The key is stored at
-`~/.pi/agent/secrets/typesafe_api_key` with mode `0600`, outside the repository.
-The command will not overwrite an existing key. For a password-manager pipe,
-use `npm run jev:auth -- --stdin`. Do not put a key in chat or a command argument.
-
-Alternatively, put `TYPESAFE_API_KEY` in this extension's Git-ignored `.env` file
-and run `chmod 600 .env`. The extension reads its own `.env` on each request,
-even when Pi starts in another working directory. It does not export the key to
-Pi's global environment or load arbitrary working-directory `.env` files.
-
-Environment variables take precedence over `.env`, then the key file is used as
-a fallback. `PI_GRAIL_API_KEY_FILE`
-overrides its location; `PI_CODING_AGENT_DIR` changes the default Pi config root.
-Optional `TYPESAFE_BASE_URL` is the API root **without `/v1`**. Model selection is
-`PI_GRAIL_JEV_MODEL`, then `TYPESAFE_DEFAULT_MODEL`, then `jev-latest`.
-Configuration is read on each call, so saving a key does not require restarting.
-
-## Use
-
-```sh
-npm run dev
-```
-
-Inside Pi:
+## Gate and reviewer
 
 ```text
 /jev status
-/jev models
-/jev test
-/reload
+/grail status
+/grail classify test/fixtures/grail-drift.json
+/grail check test/fixtures/grail-drift.json
 ```
 
-Status is local and makes no API call. `models` lists your available TypeSafe
-models. `test` sends a single small connectivity fixture and returns native API
-answers. Requests have a 10-second timeout, support cancellation, and do not
-automatically retry. Missing credentials and HTTP failures stay explicit errors.
+Classify only selects; it never launches a reviewer. Check uses the same
+selection operation and launches the shared read-only reviewer if any signal
+is flagged. Status commands are free; classify/check consume credits.
 
-The model-callable `jev_evaluate` tool accepts a raw `state`, a `questions` map
-containing Choice, Noul, or Score questions, and an optional model. It returns
-the SDK response unchanged, including probabilities, confidence, and usage.
-No thresholds or Grail invocation decisions exist in this bootstrap.
+The three independent signals are instruction drift, acting on an explicit
+unverified assumption, and an explicit evidence-to-conclusion leap. Jev asks
+three Choice questions in one request. The control launches one fresh,
+tool-free generic subagent returning the same three statuses. Reviewer prompts
+do not identify the A/B arm.
 
-The `/jev` commands work even before Pi's main LLM is authenticated. To use Pi
-for ordinary agent work, start `npm run dev` and run `/login` for your preferred
-provider (or configure that provider's API key). TypeSafe authentication is
-separate from the generative model used by Pi and the reviewer.
+Both arms receive the existing handoff, authorized updates, and raw current
+thinking/actions. Packets have raw references and a conservative **16,000-byte
+UTF-8 application limit**. This is not Jev's token limit. Essential missing or
+oversized input yields INSUFFICIENT_INPUT and skips review. No truncation,
+generated summaries, or fallback calls. NO_VISIBLE_SIGNAL does not certify correctness.
 
-## Verify and iterate
+## Monitored workers
+
+Use the model-callable grail_worker tool to launch a monitored foreground
+worker through pi-subagents. This explicit launch path is the supported POC
+scope; arbitrary or detached background workers are not covered.
+
+The child extension gates completed thinking blocks and finalized assistant
+messages before tools execute, deduplicating unchanged input within a response.
+Early flags survive later reassuring results. At the message boundary, one
+reviewer receives the accumulated raw records and decides what/how to inspect.
+Findings are delivered to the worker; any already-proposed action batch is
+paused once so the worker can reconsider. A flag is not proof of error.
+
+Only workers are monitored. Selectors and reviewers do not recursively trigger
+gates. Foreground communication uses a versioned process-local registry because
+parent and child extension event buses are distinct.
+
+Runs are capped at 10 worker responses, 20 checkpoints, and three minutes.
+Reviewers have four responses and eight read-only tool calls. Exhaustion is
+recorded explicitly. This checkout disables Pi retry and automatic compaction
+in .pi/settings.json for bounded POC runs.
+
+## Benchmark and accounting
+
+Type 1 evaluates selection only, using 12 development cases and three held-back
+cases. Intended labels are independently validated once with DeepSeek-low and
+then frozen. No workers, reviewers, or per-iteration judges run in Type 1.
+E2E benchmarking is out of scope.
+
+Timing includes actual production-Pi child startup and parsing for the control;
+common parent startup is recorded separately. Calls run serially, interleaving
+arms. Jev tuning uses development cases and a frozen basic control. Reused
+control results are marked historical; final comparisons use fresh calls.
+
+Results under benchmarks/results/<iteration-id>/ retain packets, labels,
+prompts, hashes, individual outcomes, usage, costs, timing, and tuning notes.
+The run ledger reserves estimated bounds before paid calls, retains uncertain
+charges for failed attempts, enforces a $1 ceiling, and reserves $0.20 for final
+validation. See [benchmarks/README.md](benchmarks/README.md) for commands.
+
+Shared preparation, A/B gates, live workers/reviewers, and label validation are
+separate accounting buckets. Missing usage is null; Type-1 worker/reviewer
+usage is known zero. Reasoning tokens are a subset of output, never added twice.
+Pi-derived or price-derived costs are estimates when billed cost is unavailable.
+The delegation DTO omits reasoning counts; native child telemetry supplements
+it where available, without treating absent values as measured zeros.
+
+## Checks
 
 ```sh
 npm run typecheck
 npm test
 npm run test:pi
-npm run pi:status
+npm run test:grail
+npm run test:grail:child
 ```
 
-`test:pi` launches the actual global Pi CLI in RPC mode with the linked package
-and installed pi-subagents. It uses a local HTTP fixture, not a paid model, and
-verifies registration, no startup API calls, Jev requests, secret-free status,
-and clean shutdown. It does not claim to test real Jev model quality or a real
-generative worker. `npm run test:pi -- --isolated` loads this extension explicitly
-against temporary Pi settings for diagnosis. `npm run jev:test` is the real
-TypeSafe connectivity test and requires a real key. `npm run test:pi:live` runs
-that real request through the linked extension in the global production Pi CLI,
-validates the native response, and exits nonzero on failure. Both live tests can
-consume API credits. HTTP 402 means an account/payment problem; check your
-[TypeSafe billing settings](https://console.typesafe.ai/settings/billing).
+The scripted Pi checks use localhost model fixtures and consume no paid API
+credits. Live scripts (test:grail:live, test:grail:jev, test:reasoning:live,
+test:pi:live, jev:test) make paid calls; do not run them as free checks.
 
-Reference checkouts under `/tmp` are not used by these commands.
-
-## Development references
-
-- [Pi extensions](https://pi.dev/docs/latest/extensions)
-- [Local Pi packages](https://pi.dev/docs/latest/packages)
-- [pi-subagents integration](https://github.com/nicobailon/pi-subagents/blob/main/docs/extension-api.md)
-- [TypeSafe SDK](https://docs.typesafe.ai/sdk/javascript)
-- [TypeSafe skill](https://github.com/typesafe-ai/skills/tree/main/skills/typesafe-ai)
-- [Pi extension development skill](https://github.com/Dwsy/pi-extensions-skill)
-
-The development skills are installed outside this repository and are available
-to both Codex and production Pi. Their examples
-inform setup; the installed Pi 0.87.1 types take precedence when an older example
-uses the previous `@sinclair/typebox` package name.
+Implementation follows the Pi extension skill and the TypeSafe skill's guidance
+to ask independent typed questions over shared state. Installed Pi types govern
+event semantics. Relevant references: [Pi extensions](https://pi.dev/docs/latest/extensions),
+[pi-subagents API](https://github.com/nicobailon/pi-subagents/blob/main/docs/extension-api.md),
+[TypeSafe Choice](https://docs.typesafe.ai/primitives/choice), and
+[TypeSafe models/pricing](https://docs.typesafe.ai/models).

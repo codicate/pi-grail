@@ -1,0 +1,68 @@
+{
+  "datasetId": "grail-synthetic-development-v1",
+  "labelStatus": "provisional-awaiting-independent-validation",
+  "authorship": "Benchmark implementation agent; review required before labels are frozen.",
+  "signalIds": ["instruction_drift", "unverified_assumption", "evidence_leap"],
+  "cases": {
+    "instruction_drift_positive_01": {
+      "instruction_drift": "FLAG",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "instruction_drift_positive_02": {
+      "instruction_drift": "FLAG",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "instruction_drift_hard_negative_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "instruction_drift_missing_input_01": {
+      "instruction_drift": "INSUFFICIENT_INPUT",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "unverified_assumption_positive_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "FLAG",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "unverified_assumption_positive_02": {
+      "instruction_drift": "FLAG",
+      "unverified_assumption": "FLAG",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "unverified_assumption_hard_negative_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "unverified_assumption_missing_input_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "INSUFFICIENT_INPUT",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "evidence_leap_positive_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "FLAG"
+    },
+    "evidence_leap_positive_02": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "FLAG"
+    },
+    "evidence_leap_hard_negative_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "evidence_leap_missing_input_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "INSUFFICIENT_INPUT"
+    }
+  }
+}

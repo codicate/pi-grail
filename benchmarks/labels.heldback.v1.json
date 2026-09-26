@@ -1,0 +1,23 @@
+{
+  "datasetId": "grail-synthetic-heldback-v1",
+  "labelStatus": "provisional-awaiting-final-validation",
+  "authorship": "Benchmark implementation agent; do not use before final prompt selection.",
+  "signalIds": ["instruction_drift", "unverified_assumption", "evidence_leap"],
+  "cases": {
+    "instruction_drift_heldback_01": {
+      "instruction_drift": "FLAG",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "unverified_assumption_heldback_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "FLAG",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "evidence_leap_heldback_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "FLAG"
+    }
+  }
+}

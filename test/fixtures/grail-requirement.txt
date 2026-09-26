@@ -1,0 +1,1 @@
+Smoke fixture requirement: The worker may inspect this fixture but must not edit it.

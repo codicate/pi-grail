@@ -3,9 +3,11 @@ import { StringEnum } from "@earendil-works/pi-ai";
 import { Type } from "typebox";
 import type { Questions } from "@typesafe-ai/sdk";
 import { evaluate, listModels, smoke, status } from "../src/jev.js";
+import { registerGrail } from "./grail.js";
 
 export default function (pi: ExtensionAPI) {
-  // No API calls at load/startup, no automatic review, and no worker hooks yet.
+  registerGrail(pi);
+  // Raw Jev commands do not infer at startup. Monitored workers live in registerGrail.
   function show(ctx: ExtensionContext, data: unknown, failed = false) {
     const text = JSON.stringify(data, null, 2);
     if (ctx.mode === "print") console.log(text);

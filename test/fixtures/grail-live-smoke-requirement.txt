@@ -1,0 +1,1 @@
+The live child smoke fixture must remain unchanged. Grail should pause a conflicting proposed write before this file is modified.

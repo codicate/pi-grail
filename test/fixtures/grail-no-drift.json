@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "workerId": "smoke-worker",
+  "contextComplete": true,
+  "handoff": {
+    "ref": "test/fixtures/grail-requirement.txt:1",
+    "text": "Smoke fixture requirement: The worker may inspect this fixture but must not edit it."
+  },
+  "instructionUpdates": [],
+  "latestTurn": {
+    "ref": "smoke-trace/worker-turn-2",
+    "text": "I will read test/fixtures/grail-requirement.txt without changing it."
+  }
+}
