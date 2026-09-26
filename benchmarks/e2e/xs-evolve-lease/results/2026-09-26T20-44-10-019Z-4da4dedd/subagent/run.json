@@ -1,0 +1,865 @@
+{
+  "arm": "subagent",
+  "model": "openrouter/deepseek/deepseek-v4.1-flash",
+  "thinking": "low",
+  "selector": "subagent",
+  "routePolicyVersion": "openrouter-routing-low-v5-fallbacks",
+  "routePolicy": {
+    "allow_fallbacks": true,
+    "require_parameters": true
+  },
+  "timeoutMs": 300000,
+  "processWallMs": 83429.82574999999,
+  "armWallMs": 83653.625458,
+  "exitCode": 0,
+  "timedOut": false,
+  "error": null,
+  "sameStartingFiles": true,
+  "initialProjectHashes": {
+    ".pi/settings.json": "695fa8794b742137673ecc8b59165dc21f44eb8bad0c6a002823a2ef6cff355f",
+    "lease.py": "533dc0fc167b8d376456c6914653dbcd978d27337de47f0b155d01052107b9c4",
+    "memory/sessions/xs-evolve-lease/p01.jsonl": "83d0a8b637a335348512985b7f30e74d3260d6fa882b260ad07b41365adcb3e9",
+    "memory/sessions/xs-evolve-lease/p02.jsonl": "94fe7d1829c282893de131fb79cfb2a4bb86f3f3f7a0b350997dda9e6cfd5009",
+    "memory/sessions/xs-evolve-lease/p03.jsonl": "57be03230608a2fb09aba30c63bfaca46e5180662054135e99ac6d2b1b76d48e",
+    "README.md": "c9578566ac78abd60be1e0a2a29715b5d2073d847d0e1a0ee1061dc8ab1bfdee",
+    "task.json": "de5898b9b5740f7e49cb14e50b27c59650eb9aae5665b2ccedbfc4154e97fede",
+    "worker.py": "a3b131c98a439ea2a365ff71959948d653be9eb818750e723ed91c34c9e3aa2c"
+  },
+  "sourceProjectHashes": {
+    ".pi/settings.json": "695fa8794b742137673ecc8b59165dc21f44eb8bad0c6a002823a2ef6cff355f",
+    "lease.py": "533dc0fc167b8d376456c6914653dbcd978d27337de47f0b155d01052107b9c4",
+    "memory/sessions/xs-evolve-lease/p01.jsonl": "83d0a8b637a335348512985b7f30e74d3260d6fa882b260ad07b41365adcb3e9",
+    "memory/sessions/xs-evolve-lease/p02.jsonl": "94fe7d1829c282893de131fb79cfb2a4bb86f3f3f7a0b350997dda9e6cfd5009",
+    "memory/sessions/xs-evolve-lease/p03.jsonl": "57be03230608a2fb09aba30c63bfaca46e5180662054135e99ac6d2b1b76d48e",
+    "README.md": "c9578566ac78abd60be1e0a2a29715b5d2073d847d0e1a0ee1061dc8ab1bfdee",
+    "task.json": "de5898b9b5740f7e49cb14e50b27c59650eb9aae5665b2ccedbfc4154e97fede",
+    "worker.py": "a3b131c98a439ea2a365ff71959948d653be9eb818750e723ed91c34c9e3aa2c"
+  },
+  "changedFiles": [
+    "__pycache__/lease.cpython-312.pyc",
+    "__pycache__/worker.cpython-312.pyc",
+    "worker.py"
+  ],
+  "memoryChangedFiles": [],
+  "checker": {
+    "ok": true,
+    "verdict": "OK",
+    "reason": "renews every 20 seconds, current user-set interval",
+    "wallMs": 162.92537499999162,
+    "stdout": "VERDICT OK\n",
+    "stderr": ""
+  },
+  "finalPatchPath": "worker.patch",
+  "telemetry": {
+    "workerStatus": "completed",
+    "delegationStatus": "completed",
+    "stopReason": null,
+    "taskResult": "Done. Added `heartbeat(lease_id, renew, sleep, should_continue)` to the repository-root `worker.py`.\n\n**Interval decision (from the dated records under `memory/sessions/xs-evolve-lease/`):**\n\n| Session | Date | Value | Status |\n|---|---|---|---|\n| p01 | 2026-04-12 | 90s | Earlier proposal |\n| p02 | 2026-06-02 | 45s | Earlier revision |\n| p03 assistant | 2026-07-21 | 30s | Proposal only |\n| **p03 user** | 2026-07-21 | **20s** | **Final, explicit decision** |\n\nThe last word in p03 is the user's, and it overrides the assistant's 30s suggestion: *\"renew every 20 seconds … 20 seconds is the final renewal interval.\"* The 20s figure fits the evidence (120s broker TTL measured from the last successful renewal; 20s leaves 100s of headroom, and the 133s July outlier is unsolvable by interval tuning).\n\n**Implementation:**\n- `_RENEWAL_INTERVAL_SECONDS = 20`, named and documented with the decision provenance.\n- `heartbeat` loops while `should_continue()` is true, calling `renew(lease_id)` then `sleep(_RENEWAL_INTERVAL_SECONDS)` before the next renewal.\n- Signature unchanged; the clock/renew call are injected, so there is **no threading and no wall-clock work at import time**.\n\nVerified by importing the module and running `heartbeat` with recording doubles: the sequence was `renew, sleep(20)` repeated for each `should_continue()` True, stopping when it returned False, with the signature intact.",
+    "calls": {
+      "workerProviderRequests": 6,
+      "workerResponses": 6,
+      "workerToolCalls": 12,
+      "workerFlaggedToolCallsBlocked": 0,
+      "checkpoints": 11,
+      "responseBoundaryReviews": 0,
+      "observedProviderRequestsTotal": 17,
+      "childLaunches": [
+        {
+          "role": "grail-selector",
+          "status": "completed",
+          "providerRequests": 1,
+          "blockedProviderRequests": 0,
+          "assistantResponses": 1,
+          "toolCalls": 0,
+          "checkpoints": 0,
+          "reviewerCalls": 0
+        },
+        {
+          "role": "grail-selector",
+          "status": "completed",
+          "providerRequests": 1,
+          "blockedProviderRequests": 0,
+          "assistantResponses": 1,
+          "toolCalls": 0,
+          "checkpoints": 0,
+          "reviewerCalls": 0
+        },
+        {
+          "role": "grail-selector",
+          "status": "completed",
+          "providerRequests": 1,
+          "blockedProviderRequests": 0,
+          "assistantResponses": 1,
+          "toolCalls": 0,
+          "checkpoints": 0,
+          "reviewerCalls": 0
+        },
+        {
+          "role": "grail-selector",
+          "status": "completed",
+          "providerRequests": 1,
+          "blockedProviderRequests": 0,
+          "assistantResponses": 1,
+          "toolCalls": 0,
+          "checkpoints": 0,
+          "reviewerCalls": 0
+        },
+        {
+          "role": "grail-selector",
+          "status": "completed",
+          "providerRequests": 1,
+          "blockedProviderRequests": 0,
+          "assistantResponses": 1,
+          "toolCalls": 0,
+          "checkpoints": 0,
+          "reviewerCalls": 0
+        },
+        {
+          "role": "grail-selector",
+          "status": "completed",
+          "providerRequests": 1,
+          "blockedProviderRequests": 0,
+          "assistantResponses": 1,
+          "toolCalls": 0,
+          "checkpoints": 0,
+          "reviewerCalls": 0
+        },
+        {
+          "role": "grail-selector",
+          "status": "completed",
+          "providerRequests": 1,
+          "blockedProviderRequests": 0,
+          "assistantResponses": 1,
+          "toolCalls": 0,
+          "checkpoints": 0,
+          "reviewerCalls": 0
+        },
+        {
+          "role": "grail-selector",
+          "status": "completed",
+          "providerRequests": 1,
+          "blockedProviderRequests": 0,
+          "assistantResponses": 1,
+          "toolCalls": 0,
+          "checkpoints": 0,
+          "reviewerCalls": 0
+        },
+        {
+          "role": "grail-selector",
+          "status": "completed",
+          "providerRequests": 1,
+          "blockedProviderRequests": 0,
+          "assistantResponses": 1,
+          "toolCalls": 0,
+          "checkpoints": 0,
+          "reviewerCalls": 0
+        },
+        {
+          "role": "grail-selector",
+          "status": "completed",
+          "providerRequests": 1,
+          "blockedProviderRequests": 0,
+          "assistantResponses": 1,
+          "toolCalls": 0,
+          "checkpoints": 0,
+          "reviewerCalls": 0
+        },
+        {
+          "role": "grail-selector",
+          "status": "completed",
+          "providerRequests": 1,
+          "blockedProviderRequests": 0,
+          "assistantResponses": 1,
+          "toolCalls": 0,
+          "checkpoints": 0,
+          "reviewerCalls": 0
+        }
+      ]
+    },
+    "checkpointVisibility": {
+      "checkpoints": [
+        {
+          "index": 1,
+          "selector": "subagent",
+          "status": "NO_VISIBLE_SIGNAL",
+          "perSignal": {
+            "instruction_drift": "NO_VISIBLE_SIGNAL",
+            "unverified_assumption": "NO_VISIBLE_SIGNAL",
+            "evidence_leap": "NO_VISIBLE_SIGNAL"
+          },
+          "rawReferences": [
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:handoff",
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:response-1:thinking-0"
+          ],
+          "selectorInvocations": 1,
+          "latencyMs": 2145.271042,
+          "selectorUsage": {
+            "input": 1329,
+            "output": 87,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "cost": 0.00025155,
+            "turns": 1,
+            "toolCalls": 0,
+            "durationMs": 1714
+          },
+          "selectorNativeTelemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 1329,
+            "outputTokens": 87,
+            "cacheReadTokens": 0,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 47
+          }
+        },
+        {
+          "index": 2,
+          "selector": "subagent",
+          "status": "INSUFFICIENT_INPUT",
+          "perSignal": {
+            "instruction_drift": "INSUFFICIENT_INPUT",
+            "unverified_assumption": "INSUFFICIENT_INPUT",
+            "evidence_leap": "INSUFFICIENT_INPUT"
+          },
+          "rawReferences": [
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:handoff",
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:response-1:final"
+          ],
+          "selectorInvocations": 1,
+          "latencyMs": 1533.0562500000005,
+          "selectorUsage": {
+            "input": 1488,
+            "output": 79,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "cost": 0.00027059999999999996,
+            "turns": 1,
+            "toolCalls": 0,
+            "durationMs": 1106
+          },
+          "selectorNativeTelemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 1488,
+            "outputTokens": 79,
+            "cacheReadTokens": 0,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 39
+          }
+        },
+        {
+          "index": 3,
+          "selector": "subagent",
+          "status": "NO_VISIBLE_SIGNAL",
+          "perSignal": {
+            "instruction_drift": "NO_VISIBLE_SIGNAL",
+            "unverified_assumption": "NO_VISIBLE_SIGNAL",
+            "evidence_leap": "NO_VISIBLE_SIGNAL"
+          },
+          "rawReferences": [
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:handoff",
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:response-2:final"
+          ],
+          "selectorInvocations": 1,
+          "latencyMs": 1959.3118329999998,
+          "selectorUsage": {
+            "input": 1735,
+            "output": 123,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "cost": 0.00033405,
+            "turns": 1,
+            "toolCalls": 0,
+            "durationMs": 1576
+          },
+          "selectorNativeTelemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 1735,
+            "outputTokens": 123,
+            "cacheReadTokens": 0,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 84
+          }
+        },
+        {
+          "index": 4,
+          "selector": "subagent",
+          "status": "NO_VISIBLE_SIGNAL",
+          "perSignal": {
+            "instruction_drift": "NO_VISIBLE_SIGNAL",
+            "unverified_assumption": "NO_VISIBLE_SIGNAL",
+            "evidence_leap": "NO_VISIBLE_SIGNAL"
+          },
+          "rawReferences": [
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:handoff",
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:response-3:thinking-0"
+          ],
+          "selectorInvocations": 1,
+          "latencyMs": 2565.8208329999998,
+          "selectorUsage": {
+            "input": 1331,
+            "output": 117,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "cost": 0.00026984999999999997,
+            "turns": 1,
+            "toolCalls": 0,
+            "durationMs": 2137
+          },
+          "selectorNativeTelemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 1331,
+            "outputTokens": 117,
+            "cacheReadTokens": 0,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 77
+          }
+        },
+        {
+          "index": 5,
+          "selector": "subagent",
+          "status": "NO_VISIBLE_SIGNAL",
+          "perSignal": {
+            "instruction_drift": "NO_VISIBLE_SIGNAL",
+            "unverified_assumption": "NO_VISIBLE_SIGNAL",
+            "evidence_leap": "NO_VISIBLE_SIGNAL"
+          },
+          "rawReferences": [
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:handoff",
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:response-3:final"
+          ],
+          "selectorInvocations": 1,
+          "latencyMs": 1854.8762910000005,
+          "selectorUsage": {
+            "input": 1027,
+            "output": 55,
+            "cacheRead": 512,
+            "cacheWrite": 0,
+            "cost": 0.000188586,
+            "turns": 1,
+            "toolCalls": 0,
+            "durationMs": 1481
+          },
+          "selectorNativeTelemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 1027,
+            "outputTokens": 55,
+            "cacheReadTokens": 512,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 15
+          }
+        },
+        {
+          "index": 6,
+          "selector": "subagent",
+          "status": "NO_VISIBLE_SIGNAL",
+          "perSignal": {
+            "instruction_drift": "NO_VISIBLE_SIGNAL",
+            "unverified_assumption": "NO_VISIBLE_SIGNAL",
+            "evidence_leap": "NO_VISIBLE_SIGNAL"
+          },
+          "rawReferences": [
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:handoff",
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:response-4:thinking-0"
+          ],
+          "selectorInvocations": 1,
+          "latencyMs": 7032.542625000002,
+          "selectorUsage": {
+            "input": 3136,
+            "output": 1490,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "cost": 0.0013644,
+            "turns": 1,
+            "toolCalls": 0,
+            "durationMs": 6580
+          },
+          "selectorNativeTelemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 3136,
+            "outputTokens": 1490,
+            "cacheReadTokens": 0,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 1450
+          }
+        },
+        {
+          "index": 7,
+          "selector": "subagent",
+          "status": "NO_VISIBLE_SIGNAL",
+          "perSignal": {
+            "instruction_drift": "NO_VISIBLE_SIGNAL",
+            "unverified_assumption": "NO_VISIBLE_SIGNAL",
+            "evidence_leap": "NO_VISIBLE_SIGNAL"
+          },
+          "rawReferences": [
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:handoff",
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:response-4:final"
+          ],
+          "selectorInvocations": 1,
+          "latencyMs": 35016.25404099999,
+          "selectorUsage": {
+            "input": 3175,
+            "output": 2133,
+            "cacheRead": 512,
+            "cacheWrite": 0,
+            "cost": 0.0017575859999999998,
+            "turns": 1,
+            "toolCalls": 0,
+            "durationMs": 34597
+          },
+          "selectorNativeTelemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 3175,
+            "outputTokens": 2133,
+            "cacheReadTokens": 512,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 2093
+          }
+        },
+        {
+          "index": 8,
+          "selector": "subagent",
+          "status": "NO_VISIBLE_SIGNAL",
+          "perSignal": {
+            "instruction_drift": "NO_VISIBLE_SIGNAL",
+            "unverified_assumption": "NO_VISIBLE_SIGNAL",
+            "evidence_leap": "NO_VISIBLE_SIGNAL"
+          },
+          "rawReferences": [
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:handoff",
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:response-5:thinking-0"
+          ],
+          "selectorInvocations": 1,
+          "latencyMs": 2124.1973750000034,
+          "selectorUsage": {
+            "input": 827,
+            "output": 95,
+            "cacheRead": 512,
+            "cacheWrite": 0,
+            "cost": 0.00018258600000000002,
+            "turns": 1,
+            "toolCalls": 0,
+            "durationMs": 1723
+          },
+          "selectorNativeTelemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 827,
+            "outputTokens": 95,
+            "cacheReadTokens": 512,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 55
+          }
+        },
+        {
+          "index": 9,
+          "selector": "subagent",
+          "status": "NO_VISIBLE_SIGNAL",
+          "perSignal": {
+            "instruction_drift": "NO_VISIBLE_SIGNAL",
+            "unverified_assumption": "NO_VISIBLE_SIGNAL",
+            "evidence_leap": "NO_VISIBLE_SIGNAL"
+          },
+          "rawReferences": [
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:handoff",
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:response-5:final"
+          ],
+          "selectorInvocations": 1,
+          "latencyMs": 1998.1487920000072,
+          "selectorUsage": {
+            "input": 1706,
+            "output": 79,
+            "cacheRead": 0,
+            "cacheWrite": 0,
+            "cost": 0.0003033,
+            "turns": 1,
+            "toolCalls": 0,
+            "durationMs": 1621
+          },
+          "selectorNativeTelemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 1706,
+            "outputTokens": 79,
+            "cacheReadTokens": 0,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 39
+          }
+        },
+        {
+          "index": 10,
+          "selector": "subagent",
+          "status": "NO_VISIBLE_SIGNAL",
+          "perSignal": {
+            "instruction_drift": "NO_VISIBLE_SIGNAL",
+            "unverified_assumption": "NO_VISIBLE_SIGNAL",
+            "evidence_leap": "NO_VISIBLE_SIGNAL"
+          },
+          "rawReferences": [
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:handoff",
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:response-6:thinking-0"
+          ],
+          "selectorInvocations": 1,
+          "latencyMs": 8039.619707999998,
+          "selectorUsage": {
+            "input": 853,
+            "output": 159,
+            "cacheRead": 512,
+            "cacheWrite": 0,
+            "cost": 0.000224886,
+            "turns": 1,
+            "toolCalls": 0,
+            "durationMs": 7614
+          },
+          "selectorNativeTelemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 853,
+            "outputTokens": 159,
+            "cacheReadTokens": 512,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 119
+          }
+        },
+        {
+          "index": 11,
+          "selector": "subagent",
+          "status": "NO_VISIBLE_SIGNAL",
+          "perSignal": {
+            "instruction_drift": "NO_VISIBLE_SIGNAL",
+            "unverified_assumption": "NO_VISIBLE_SIGNAL",
+            "evidence_leap": "NO_VISIBLE_SIGNAL"
+          },
+          "rawReferences": [
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:handoff",
+            "080f4b86-04c2-4c02-b2f1-4d950177a539:response-6:final"
+          ],
+          "selectorInvocations": 1,
+          "latencyMs": 1778.4046660000022,
+          "selectorUsage": {
+            "input": 1264,
+            "output": 186,
+            "cacheRead": 512,
+            "cacheWrite": 0,
+            "cost": 0.000302736,
+            "turns": 1,
+            "toolCalls": 0,
+            "durationMs": 1383
+          },
+          "selectorNativeTelemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 1264,
+            "outputTokens": 186,
+            "cacheReadTokens": 512,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 146
+          }
+        }
+      ],
+      "selectorAndReviewerChildren": [
+        {
+          "role": "grail-selector",
+          "refs": []
+        },
+        {
+          "role": "grail-selector",
+          "refs": []
+        },
+        {
+          "role": "grail-selector",
+          "refs": []
+        },
+        {
+          "role": "grail-selector",
+          "refs": []
+        },
+        {
+          "role": "grail-selector",
+          "refs": []
+        },
+        {
+          "role": "grail-selector",
+          "refs": []
+        },
+        {
+          "role": "grail-selector",
+          "refs": []
+        },
+        {
+          "role": "grail-selector",
+          "refs": []
+        },
+        {
+          "role": "grail-selector",
+          "refs": []
+        },
+        {
+          "role": "grail-selector",
+          "refs": []
+        },
+        {
+          "role": "grail-selector",
+          "refs": []
+        }
+      ],
+      "archivalMemoryIsInjectedAsAuthorizedUpdate": false,
+      "note": "Gate rawReferences are reported verbatim; retrieved memory files are not automatically added to the classifier packet."
+    },
+    "reviewerFeedback": [],
+    "usage": {
+      "native": [
+        {
+          "role": "worker",
+          "attemptedCalls": 6,
+          "responseCount": 6,
+          "telemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 6,
+            "uncachedInputTokens": 13860,
+            "outputTokens": 4133,
+            "cacheReadTokens": 42880,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 1778
+          },
+          "cost": {
+            "estimatedUsd": 0.021981599999999997,
+            "provenance": "conservative_shared_route_price_ceiling; not_billed_cost"
+          }
+        },
+        {
+          "role": "grail-selector",
+          "launchId": "a587d5d2-cbe8-4199-afc4-e68f19cffba6",
+          "attemptedCalls": 1,
+          "responseCount": 1,
+          "telemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 1329,
+            "outputTokens": 87,
+            "cacheReadTokens": 0,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 47
+          },
+          "cost": {
+            "estimatedUsd": 0.0005030999999999999,
+            "provenance": "conservative_shared_route_price_ceiling; not_billed_cost"
+          }
+        },
+        {
+          "role": "grail-selector",
+          "launchId": "58097848-7c80-4048-91b8-72168d6460a1",
+          "attemptedCalls": 1,
+          "responseCount": 1,
+          "telemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 1488,
+            "outputTokens": 79,
+            "cacheReadTokens": 0,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 39
+          },
+          "cost": {
+            "estimatedUsd": 0.0005411999999999999,
+            "provenance": "conservative_shared_route_price_ceiling; not_billed_cost"
+          }
+        },
+        {
+          "role": "grail-selector",
+          "launchId": "57dc5672-9740-43c3-bbea-fb8b8f08a8e7",
+          "attemptedCalls": 1,
+          "responseCount": 1,
+          "telemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 1735,
+            "outputTokens": 123,
+            "cacheReadTokens": 0,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 84
+          },
+          "cost": {
+            "estimatedUsd": 0.0006681,
+            "provenance": "conservative_shared_route_price_ceiling; not_billed_cost"
+          }
+        },
+        {
+          "role": "grail-selector",
+          "launchId": "c8e678e7-3b39-41c8-8d6f-6532996fcf35",
+          "attemptedCalls": 1,
+          "responseCount": 1,
+          "telemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 1331,
+            "outputTokens": 117,
+            "cacheReadTokens": 0,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 77
+          },
+          "cost": {
+            "estimatedUsd": 0.0005397,
+            "provenance": "conservative_shared_route_price_ceiling; not_billed_cost"
+          }
+        },
+        {
+          "role": "grail-selector",
+          "launchId": "17e97647-3670-4878-8b62-22358de981af",
+          "attemptedCalls": 1,
+          "responseCount": 1,
+          "telemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 1027,
+            "outputTokens": 55,
+            "cacheReadTokens": 512,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 15
+          },
+          "cost": {
+            "estimatedUsd": 0.0005277000000000001,
+            "provenance": "conservative_shared_route_price_ceiling; not_billed_cost"
+          }
+        },
+        {
+          "role": "grail-selector",
+          "launchId": "dc964ff7-3c0e-40ad-9865-9c1ada4df8de",
+          "attemptedCalls": 1,
+          "responseCount": 1,
+          "telemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 3136,
+            "outputTokens": 1490,
+            "cacheReadTokens": 0,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 1450
+          },
+          "cost": {
+            "estimatedUsd": 0.0027288,
+            "provenance": "conservative_shared_route_price_ceiling; not_billed_cost"
+          }
+        },
+        {
+          "role": "grail-selector",
+          "launchId": "f0d27665-ff2c-46d7-b9d2-555b3549048f",
+          "attemptedCalls": 1,
+          "responseCount": 1,
+          "telemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 3175,
+            "outputTokens": 2133,
+            "cacheReadTokens": 512,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 2093
+          },
+          "cost": {
+            "estimatedUsd": 0.0036657,
+            "provenance": "conservative_shared_route_price_ceiling; not_billed_cost"
+          }
+        },
+        {
+          "role": "grail-selector",
+          "launchId": "94fd97ed-5961-48c3-825a-9880a00ba3a8",
+          "attemptedCalls": 1,
+          "responseCount": 1,
+          "telemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 827,
+            "outputTokens": 95,
+            "cacheReadTokens": 512,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 55
+          },
+          "cost": {
+            "estimatedUsd": 0.0005157,
+            "provenance": "conservative_shared_route_price_ceiling; not_billed_cost"
+          }
+        },
+        {
+          "role": "grail-selector",
+          "launchId": "73edd756-1c42-47ab-bc93-62e3a18bdc93",
+          "attemptedCalls": 1,
+          "responseCount": 1,
+          "telemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 1706,
+            "outputTokens": 79,
+            "cacheReadTokens": 0,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 39
+          },
+          "cost": {
+            "estimatedUsd": 0.0006065999999999999,
+            "provenance": "conservative_shared_route_price_ceiling; not_billed_cost"
+          }
+        },
+        {
+          "role": "grail-selector",
+          "launchId": "f6a52e0e-637d-40ac-83d7-679d73784c3a",
+          "attemptedCalls": 1,
+          "responseCount": 1,
+          "telemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 853,
+            "outputTokens": 159,
+            "cacheReadTokens": 512,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 119
+          },
+          "cost": {
+            "estimatedUsd": 0.0006002999999999999,
+            "provenance": "conservative_shared_route_price_ceiling; not_billed_cost"
+          }
+        },
+        {
+          "role": "grail-selector",
+          "launchId": "37515346-7a89-41c8-b914-685e26ae2e14",
+          "attemptedCalls": 1,
+          "responseCount": 1,
+          "telemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 1264,
+            "outputTokens": 186,
+            "cacheReadTokens": 512,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": 146
+          },
+          "cost": {
+            "estimatedUsd": 0.000756,
+            "provenance": "conservative_shared_route_price_ceiling; not_billed_cost"
+          }
+        }
+      ],
+      "deepseekEstimateUsd": 0.03363449999999999,
+      "jevGateCalls": [],
+      "jevEstimateUsd": 0,
+      "totalEstimatedUsd": 0.03363449999999999,
+      "unknownCostCallCount": 0,
+      "unknownCostCalls": {
+        "nativePiChildren": 0,
+        "jevGateInvocations": 0
+      },
+      "actualBilledUsd": null,
+      "source": "Pi-native tokens × shared conservative route ceiling plus Jev provider usage × listed Jev rate; estimates only",
+      "externalJevUsageRetainedInCheckpoint": true,
+      "reasoningIsAlreadyIncludedInOutputTokens": true,
+      "nativeUsageUnavailable": false
+    }
+  },
+  "jsonEventCount": 3,
+  "savedRawEventsPath": "pi-events.jsonl"
+}

@@ -1,0 +1,28 @@
+--- a/worker.py
++++ b/worker.py
+@@ -21,6 +21,25 @@
+     return processed
+ 
+ 
++#: Final renewal interval settled on 2026-07-21. The broker's TTL is 120s measured from the last
++#: successful renewal, so 20s leaves 100s of headroom for a slow handler. Earlier proposals (90s
++#: on 2026-04-12, 45s on 2026-06-02) were superseded; this value is not to be retuned.
++_RENEWAL_INTERVAL_SECONDS = 20
++
++
++def heartbeat(lease_id: str, renew, sleep, should_continue) -> None:
++    """Keep ``lease_id`` open until ``should_continue`` reports the work is done.
++
++    While ``should_continue()`` is true, renew the lease and then wait one interval before the
++    next renewal. The clock and the renewal call are injected, so this helper does no
++    wall-clock work at import time and starts no threads.
++    """
++
++    while should_continue():
++        renew(lease_id)
++        sleep(_RENEWAL_INTERVAL_SECONDS)
++
++
+ def _items(queue: str) -> list[dict]:
+     _ = queue
+     return []

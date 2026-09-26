@@ -7,7 +7,6 @@ import { fileURLToPath } from "node:url";
 import { performance } from "node:perf_hooks";
 import { promisify } from "node:util";
 import { computedCost, normalizeUsage } from "../benchmarks/core.js";
-import { LEDGER_PATH, reserveCalls, settleCall, snapshot as ledgerSnapshot, type LedgerCall } from "../benchmarks/ledger.js";
 import { DEEPSEEK_ESTIMATE_PRICING, OPENROUTER_PROVIDER_POLICY, RUNTIME_POLICY_VERSION } from "../src/runtime-policy.js";
 import { productionPi } from "./production-pi.mjs";
 
@@ -22,7 +21,6 @@ const MODEL = "openrouter/deepseek/deepseek-v4.1-flash";
 const THINKING = "low";
 const ARMS = ["jev", "subagent"] as const;
 const ARM_TIMEOUT_MS = 5 * 60 * 1_000;
-const ARM_RESERVATION_USD = 4;
 
 type Obj = Record<string, any>;
 const readJson = (path: string): Obj => JSON.parse(readFileSync(path, "utf8")) as Obj;
@@ -211,13 +209,11 @@ function runSummary(workerResult: Obj | null) {
   };
 }
 
-async function runArm(arm: typeof ARMS[number], runRoot: string, baselineHashes: Record<string, string>,
-  commonStartHash: string, reservation: LedgerCall) {
+async function runArm(arm: typeof ARMS[number], runRoot: string, baselineHashes: Record<string, string>, commonStartHash: string) {
   const armStarted = performance.now();
   const outputDir = join(runRoot, arm);
   const workspace = join(outputDir, "workspace");
   mkdirSync(outputDir, { recursive: true, mode: 0o700 });
-  writeJson(join(outputDir, "ledger-reserved.json"), ledgerSnapshot(LEDGER_PATH));
   cpSync(PROJECT, workspace, { recursive: true, force: false, errorOnExist: true });
   const beforeHashes = treeHashes(workspace);
   const sameStartingFiles = sha(JSON.stringify(beforeHashes)) === commonStartHash;
@@ -256,32 +252,18 @@ async function runArm(arm: typeof ARMS[number], runRoot: string, baselineHashes:
   writeJson(join(outputDir, "checker-result.json"), checker);
   const telemetry = runSummary(parsed.commandResult);
   const armWallMs = performance.now() - armStarted;
-  const estimatedUsd = (telemetry.usage as Obj).totalEstimatedUsd;
-  const costKnown = typeof estimatedUsd === "number" && Number.isFinite(estimatedUsd) && estimatedUsd >= 0;
-  const runSucceeded = error === null && !timedOut && exitCode === 0 && parsed.commandResult !== null
-    && telemetry.workerStatus === "completed";
-  const settlement = costKnown
-    ? settleCall(reservation.id, { success: runSucceeded, settledUsd: estimatedUsd,
-        costProvenance: "usage-derived-estimate-not-billed-cost",
-        error: runSucceeded ? undefined : error ?? "production_pi_run_failed" }, LEDGER_PATH)
-    : null;
-  const ledgerAfterArm = ledgerSnapshot(LEDGER_PATH);
-  writeJson(join(outputDir, "ledger-after-arm.json"), ledgerAfterArm);
   const record = { arm, model: MODEL, thinking: THINKING, selector: arm, routePolicyVersion: RUNTIME_POLICY_VERSION,
     routePolicy: OPENROUTER_PROVIDER_POLICY, timeoutMs: ARM_TIMEOUT_MS, processWallMs, armWallMs, exitCode, timedOut, error,
     sameStartingFiles, initialProjectHashes: beforeHashes, sourceProjectHashes: baselineHashes,
     changedFiles, memoryChangedFiles: memoryChanges, checker, finalPatchPath: "worker.patch",
-    telemetry, reservation: { kind: reservation.kind, id: reservation.id, reservedUsd: reservation.reservedUsd,
-      status: settlement ? "settled" : "reserved_unknown_cost", settledUsd: settlement?.settledUsd ?? null,
-      committedUsd: settlement?.committedUsd ?? reservation.reservedUsd,
-      costProvenance: settlement?.costProvenance ?? "unknown_cost_reservation_retained" },
+    telemetry,
     jsonEventCount: parsed.events.length, savedRawEventsPath: "pi-events.jsonl" };
   writeJson(join(outputDir, "run.json"), record);
   return { arm, passedChecker: checker.ok, status: telemetry.workerStatus, processWallMs, armWallMs,
     checkpoints: (telemetry.checkpointVisibility.checkpoints as unknown[]).length,
     providerRequestsObservedTotal: (telemetry.calls as Obj).observedProviderRequestsTotal,
-    estimatedUsd: costKnown ? estimatedUsd : null, reservationId: reservation.id,
-    reservationStatus: settlement ? "settled" : "reserved_unknown_cost",
+    estimatedUsd: typeof (telemetry.usage as Obj).totalEstimatedUsd === "number"
+      ? (telemetry.usage as Obj).totalEstimatedUsd : null,
     changedFiles, memoryChangedFiles: memoryChanges, outputDir };
 }
 
@@ -295,54 +277,17 @@ async function main() {
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
   const runRoot = join(DEMO, "results", `${stamp}-${randomUUID().slice(0, 8)}`);
   mkdirSync(runRoot, { recursive: true, mode: 0o700 });
-  const ledgerBefore = ledgerSnapshot(LEDGER_PATH);
-  writeJson(join(runRoot, "ledger-before-reservation.json"), ledgerBefore);
-  const promptHash = sha(JSON.stringify({ demo: "xs-evolve-lease", task: readFileSync(join(PROJECT, "task.json"), "utf8"),
-    model: MODEL, thinking: THINKING, selectorContract: "baseline-v1" }));
-  let reservations: LedgerCall[];
-  try {
-    reservations = reserveCalls(ARMS.map(arm => ({ kind: "e2e-arm-bundle", selector: arm,
-      caseId: "xs-evolve-lease-live-demo", promptHash, reservedUsd: ARM_RESERVATION_USD, phase: "development" })),
-    "development", LEDGER_PATH);
-  } catch (error) {
-    writeJson(join(runRoot, "preflight-failure.json"), { error: error instanceof Error ? error.message : "ledger reservation failed",
-      noPiOrProviderCallsLaunched: true });
-    writeJson(join(runRoot, "ledger-after-reservation-failure.json"), ledgerSnapshot(LEDGER_PATH));
-    throw error;
-  }
-  writeJson(join(runRoot, "ledger-reserved.json"), ledgerSnapshot(LEDGER_PATH));
-  writeJson(join(runRoot, "reservation-plan.json"), reservations);
   const commonStartHash = sha(JSON.stringify(fixture.projectHashes));
   const runs = [];
-  for (let index = 0; index < ARMS.length; index++) {
-    const arm = ARMS[index]!;
-    const run = await runArm(arm, runRoot, fixture.projectHashes, commonStartHash, reservations[index]!);
+  for (const arm of ARMS) {
+    const run = await runArm(arm, runRoot, fixture.projectHashes, commonStartHash);
     runs.push(run);
     console.log(JSON.stringify({ event: "arm-complete", ...run }));
-    if (run.providerRequestsObservedTotal === 0) {
-      console.log(JSON.stringify({ event: "pair-stopped", afterArm: arm,
-        reason: "The completed arm reports zero provider requests; preserved artifacts for manual diagnosis, with no automatic retry." }));
-      for (const unlaunched of reservations.slice(index + 1)) {
-        const released = settleCall(unlaunched.id, { success: true, settledUsd: 0,
-          costProvenance: "arm_not_launched_no_provider_requests" }, LEDGER_PATH);
-        const unlaunchedDir = join(runRoot, unlaunched.selector);
-        mkdirSync(unlaunchedDir, { recursive: true, mode: 0o700 });
-        writeJson(join(unlaunchedDir, "not-launched.json"), { reason: `stopped after ${arm} reported zero provider requests; no automatic retry`,
-          reservationId: unlaunched.id, settledUsd: 0, status: released.status });
-        writeJson(join(unlaunchedDir, "ledger-after-arm.json"), ledgerSnapshot(LEDGER_PATH));
-      }
-      break;
-    }
   }
-  writeJson(join(runRoot, "ledger-after-arms.json"), ledgerSnapshot(LEDGER_PATH));
   const summary = { demo: "xs-evolve-lease", runRoot, startedAt: stamp, sourceCommit: fixture.manifest.upstream.commit,
     arms: runs, checkerContract: "upstream fake-clock callback checker; not a live lease safety test",
     totalWallMs: performance.now() - totalStarted,
-    reservations: reservations.map(reservation => ({ id: reservation.id, kind: reservation.kind,
-      selector: reservation.selector, reservedUsd: reservation.reservedUsd,
-      status: ledgerSnapshot(LEDGER_PATH).calls.find(call => call.id === reservation.id)?.status ?? "missing" })),
-    ledgerSnapshotPath: "ledger-after-arms.json",
-    costAccounting: "conservative DeepSeek route-ceiling estimates plus Jev listed-rate estimates where usage is known; actual billed cost unknown" };
+    costAccounting: "usage telemetry is recorded for comparison; no local spend ceiling or reservation blocks execution" };
   writeJson(join(runRoot, "summary.json"), summary);
   console.log(JSON.stringify(summary, null, 2));
 }

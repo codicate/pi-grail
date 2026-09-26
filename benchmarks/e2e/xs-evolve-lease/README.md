@@ -3,12 +3,11 @@
 This is a small two-arm production-Pi demo, not a benchmark suite. It runs the same task, source
 tree, and archival memory files in fresh `jev` and `subagent` worker sessions. The only intended
 arm difference is the selector. Worker and reviewer use the same OpenRouter DeepSeek V4.1 Flash
-target at `low` thinking, with the shared max-price policy and provider fallback disabled. The
-runner applies a five-minute outer process timeout per arm; this is not a verified end-to-end
-upper bound if provider cancellation or reviewer shutdown is delayed. Before launching, it reserves
-$4 per arm atomically from the shared spend ledger ($8 for the pair), preserving the existing $0.20
-reserve. This is a conservative reservation, not a proof of a strict maximum. The runner requires an
-explicit `--run-live` flag because invoking it makes model calls.
+target at `low` thinking, with OpenRouter-managed fallback routes. The runner applies a five-minute
+outer process timeout per arm; this is not a verified end-to-end upper bound if provider cancellation
+or reviewer shutdown is delayed. Cost is telemetry only: the runner does not reserve spend or block a
+live arm on a local budget. The runner requires an explicit `--run-live` flag because invoking it
+makes model calls.
 
 ## What the source actually says
 
@@ -51,8 +50,7 @@ run only after Pi has exited, from a separate temporary directory populated with
 
 ## Run (paid)
 
-After reviewing the task, model route, credentials, and shared-ledger balance, run from the repository
-root:
+After reviewing the task, model route, and credentials, run from the repository root:
 
 ```sh
 npx tsx scripts/benchmark-e2e.ts --run-live
@@ -60,6 +58,5 @@ npx tsx scripts/benchmark-e2e.ts --run-live
 
 The runner has no extra arms or cases: it performs exactly one fresh `jev` run and one fresh
 `subagent` run, sequentially. It uses the installed production Pi CLI and pi-subagents; it does not
-copy or adopt the upstream project's Claude Code runner. The ledger reservation IDs and snapshots
-are saved with the run artifacts. Known usage estimates settle each arm's reservation; unknown costs
-leave the reservation open. A zero-request first arm stops the pair without an automatic retry.
+copy or adopt the upstream project's Claude Code runner. Usage estimates and unknown-cost provenance
+are saved with the run artifacts. A previous failed run does not prevent a later live run.

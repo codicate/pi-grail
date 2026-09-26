@@ -1,0 +1,45 @@
+{
+  "demo": "xs-evolve-lease",
+  "runRoot": "/Users/henry/Documents/ChatGPT/mongo hack/benchmarks/e2e/xs-evolve-lease/results/2026-09-26T20-44-10-019Z-4da4dedd",
+  "startedAt": "2026-09-26T20-44-10-019Z",
+  "sourceCommit": "ee23ad22026ab63213c2282949cd5b9b6097664b",
+  "arms": [
+    {
+      "arm": "jev",
+      "passedChecker": true,
+      "status": "completed",
+      "processWallMs": 20179.810792,
+      "armWallMs": 20417.721584,
+      "checkpoints": 12,
+      "providerRequestsObservedTotal": 19,
+      "estimatedUsd": 0.02698182,
+      "changedFiles": [
+        "__pycache__/lease.cpython-312.pyc",
+        "__pycache__/worker.cpython-312.pyc",
+        "worker.py"
+      ],
+      "memoryChangedFiles": [],
+      "outputDir": "/Users/henry/Documents/ChatGPT/mongo hack/benchmarks/e2e/xs-evolve-lease/results/2026-09-26T20-44-10-019Z-4da4dedd/jev"
+    },
+    {
+      "arm": "subagent",
+      "passedChecker": true,
+      "status": "completed",
+      "processWallMs": 83429.82574999999,
+      "armWallMs": 83653.625458,
+      "checkpoints": 11,
+      "providerRequestsObservedTotal": 17,
+      "estimatedUsd": 0.03363449999999999,
+      "changedFiles": [
+        "__pycache__/lease.cpython-312.pyc",
+        "__pycache__/worker.cpython-312.pyc",
+        "worker.py"
+      ],
+      "memoryChangedFiles": [],
+      "outputDir": "/Users/henry/Documents/ChatGPT/mongo hack/benchmarks/e2e/xs-evolve-lease/results/2026-09-26T20-44-10-019Z-4da4dedd/subagent"
+    }
+  ],
+  "checkerContract": "upstream fake-clock callback checker; not a live lease safety test",
+  "totalWallMs": 104078.596916,
+  "costAccounting": "usage telemetry is recorded for comparison; no local spend ceiling or reservation blocks execution"
+}

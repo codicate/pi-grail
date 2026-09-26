@@ -1,12 +1,11 @@
-// Let OpenRouter select an available route within a fixed price ceiling.
-// A pinned DeepSeek route returned HTTP 404; no automatic provider fallback.
-export const RUNTIME_POLICY_VERSION = "bounded-routing-low-v4-throughput";
+// Let OpenRouter select an available route for the requested model. Fallbacks are
+// OpenRouter-managed routes under the same account/key; this is not a new provider
+// integration. Cost remains telemetry only and does not constrain routing.
+export const RUNTIME_POLICY_VERSION = "openrouter-routing-low-v5-fallbacks";
 export const SELECTOR_OUTPUT_TOKENS = 8192;
 export const OPENROUTER_PROVIDER_POLICY = {
-  allow_fallbacks: false,
+  allow_fallbacks: true,
   require_parameters: true,
-  sort: "throughput",
-  max_price: { prompt: 0.3, completion: 1.2 },
 };
 
 // Conservative routing ceilings. Do not assume a cache discount across routes.

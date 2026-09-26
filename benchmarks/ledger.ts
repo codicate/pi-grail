@@ -5,6 +5,9 @@ import { randomUUID } from "node:crypto";
 export const LEDGER_PATH = join(process.cwd(), "benchmarks/state/spend-ledger.json");
 export const TOTAL_LIMIT_USD = 10;
 export const FINAL_RESERVE_USD = 0.2;
+// Cost is telemetry for this POC. Keep ledger records for provenance, but never
+// block a benchmark call because of a local estimate or reservation.
+export const ENFORCE_BUDGET = false;
 
 export type BudgetPhase = "development" | "final";
 export type LedgerCall = {
@@ -94,7 +97,7 @@ export function reserveCalls(calls: Array<Omit<LedgerCall, "id" | "status" | "st
     }
     const cap = phase === "development" ? ledger.ceilingUsd - ledger.finalReserveUsd : ledger.ceilingUsd;
     const committedOrReserved = availableUse(ledger);
-    if (committedOrReserved + requested > cap + 1e-12) {
+    if (ENFORCE_BUDGET && committedOrReserved + requested > cap + 1e-12) {
       throw new Error(`Benchmark call reservation exceeds the $${cap.toFixed(2)} ${phase === "development" ? "development cap (preserving the final reserve)" : "total ceiling"}. No call was launched.`);
     }
     const entries: LedgerCall[] = calls.map(call => ({ ...call, phase, id: randomUUID(),

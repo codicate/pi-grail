@@ -1,0 +1,8 @@
+{
+  "ok": true,
+  "verdict": "OK",
+  "reason": "renews every 20 seconds, current user-set interval",
+  "wallMs": 162.92537499999162,
+  "stdout": "VERDICT OK\n",
+  "stderr": ""
+}
