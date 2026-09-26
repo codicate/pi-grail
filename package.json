@@ -16,6 +16,7 @@
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test test/*.test.ts",
     "test:pi": "tsx scripts/test-pi.ts",
+    "test:pi:live": "tsx scripts/test-pi-live.ts",
     "pi:status": "node scripts/pi.mjs --approve --offline --no-session --mode json -p \"/jev status\"",
     "jev:auth": "node scripts/jev-auth.mjs",
     "jev:status": "tsx scripts/jev.ts status",

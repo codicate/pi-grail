@@ -1,20 +1,23 @@
 import assert from "node:assert/strict";
-import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
+import { execFile, spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import { once } from "node:events";
 import { createServer } from "node:http";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { promisify } from "node:util";
 import { productionPi } from "./production-pi.mjs";
 
 const executable = productionPi();
 const isolated = process.argv.includes("--isolated");
 const apiCalls: string[] = [];
+let failInference = false;
 const server = createServer(async (req, res) => {
   apiCalls.push(req.url || "");
   for await (const _chunk of req) { /* drain request */ }
   res.setHeader("content-type", "application/json");
-  if (req.url === "/v1/models") res.end(JSON.stringify({ models: [{ name: "jev-fixture", description: "Local transport fixture", release_date: "2026-09-26" }] }));
+  if (req.url === "/v1/models") res.end(JSON.stringify([{ name: "jev-fixture", description: "Local transport fixture", release_date: "2026-09-26" }]));
+  else if (failInference) { res.writeHead(402); res.end(JSON.stringify({ detail: "Billing failure fixture" })); }
   else res.end(JSON.stringify({ model: "jev-fixture", answers: { ready: { type: "noul", noul: 0.99 } }, usage: { input_tokens: 20, output_tokens: 5 } }));
 });
 server.listen(0, "127.0.0.1");
@@ -76,7 +79,16 @@ try {
   child.stdin.end();
   await until(() => child?.exitCode !== null, "shutdown");
   assert.equal(child.exitCode, 0);
-  console.log(`PASS: production Pi (${executable}) loaded the local extension${isolated ? "" : " alongside pi-subagents"}, exposed /jev, made two fixture API requests, and shut down cleanly.`);
+  if (!isolated) {
+    const exec = promisify(execFile);
+    const args = ["--import", "tsx", "scripts/test-pi-live.ts"];
+    const options = { env, timeout: 30_000 };
+    const live = await exec(process.execPath, args, options);
+    assert.equal(JSON.parse(live.stdout).passed, true, "live-test runner accepts a valid native response");
+    failInference = true;
+    await assert.rejects(exec(process.execPath, args, options), (error: any) => error.code === 1 && /HTTP 402/.test(error.stderr));
+  }
+  console.log(`PASS: production Pi (${executable}) loaded the local extension${isolated ? "" : " alongside pi-subagents"}, exposed /jev, made ${apiCalls.length} fixture API requests, and shut down cleanly.`);
 } finally {
   if (child?.exitCode === null) { child.stdin.end(); child.kill("SIGTERM"); }
   server.closeAllConnections();

@@ -26,3 +26,25 @@ test("a missing key stays unconfigured, and accidental /v1 endpoint duplication 
   assert.throws(() => readConfig({ TYPESAFE_BASE_URL: "https://api.typesafe.ai/v1" }), /omit \/v1/);
   assert.throws(() => readConfig({ TYPESAFE_BASE_URL: "not-a-url" }), /valid HTTP\(S\) API root/);
 });
+
+test("the package .env is refreshed on each read, with environment precedence and secret-free status", () => {
+  const dir = mkdtempSync(join(tmpdir(), "pi-grail-dotenv-"));
+  const envFile = join(dir, ".env");
+  const saved = process.env.TYPESAFE_API_KEY;
+  try {
+    delete process.env.TYPESAFE_API_KEY;
+    writeFileSync(envFile, 'TYPESAFE_API_KEY="dotenv-fixture-key"\nPI_GRAIL_JEV_MODEL=jev-latest\n', { mode: 0o600 });
+    const first = readConfig(undefined, envFile);
+    assert.equal(first.apiKey, "dotenv-fixture-key");
+    assert.equal(first.keySource, "dotenv");
+    assert.ok(!JSON.stringify(publicConfig(first)).includes("dotenv-fixture-key"));
+    writeFileSync(envFile, "TYPESAFE_API_KEY=rotated-fixture-key\n");
+    assert.equal(readConfig(undefined, envFile).apiKey, "rotated-fixture-key");
+    process.env.TYPESAFE_API_KEY = "environment-fixture-key";
+    assert.equal(readConfig(undefined, envFile).keySource, "environment");
+    assert.equal(readConfig(undefined, envFile).apiKey, "environment-fixture-key");
+  } finally {
+    if (saved === undefined) delete process.env.TYPESAFE_API_KEY;
+    else process.env.TYPESAFE_API_KEY = saved;
+  }
+});

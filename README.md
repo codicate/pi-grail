@@ -45,12 +45,17 @@ Input is hidden. The key is stored at
 The command will not overwrite an existing key. For a password-manager pipe,
 use `npm run jev:auth -- --stdin`. Do not put a key in chat or a command argument.
 
-`TYPESAFE_API_KEY` takes precedence over the key file. `PI_GRAIL_API_KEY_FILE`
+Alternatively, put `TYPESAFE_API_KEY` in this extension's Git-ignored `.env` file
+and run `chmod 600 .env`. The extension reads its own `.env` on each request,
+even when Pi starts in another working directory. It does not export the key to
+Pi's global environment or load arbitrary working-directory `.env` files.
+
+Environment variables take precedence over `.env`, then the key file is used as
+a fallback. `PI_GRAIL_API_KEY_FILE`
 overrides its location; `PI_CODING_AGENT_DIR` changes the default Pi config root.
 Optional `TYPESAFE_BASE_URL` is the API root **without `/v1`**. Model selection is
 `PI_GRAIL_JEV_MODEL`, then `TYPESAFE_DEFAULT_MODEL`, then `jev-latest`.
 Configuration is read on each call, so saving a key does not require restarting.
-`.env.example` is documentation; `.env` files are not automatically loaded.
 
 ## Use
 
@@ -97,7 +102,11 @@ verifies registration, no startup API calls, Jev requests, secret-free status,
 and clean shutdown. It does not claim to test real Jev model quality or a real
 generative worker. `npm run test:pi -- --isolated` loads this extension explicitly
 against temporary Pi settings for diagnosis. `npm run jev:test` is the real
-TypeSafe connectivity test and requires a real key.
+TypeSafe connectivity test and requires a real key. `npm run test:pi:live` runs
+that real request through the linked extension in the global production Pi CLI,
+validates the native response, and exits nonzero on failure. Both live tests can
+consume API credits. HTTP 402 means an account/payment problem; check your
+[TypeSafe billing settings](https://console.typesafe.ai/settings/billing).
 
 Reference checkouts under `/tmp` are not used by these commands.
 
