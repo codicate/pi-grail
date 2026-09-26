@@ -1,0 +1,8 @@
+{
+  "ok": false,
+  "verdict": "NO_HEARTBEAT",
+  "reason": "worker.py does not define heartbeat()",
+  "wallMs": 194.7170839999999,
+  "stdout": "VERDICT NO_HEARTBEAT\n",
+  "stderr": ""
+}

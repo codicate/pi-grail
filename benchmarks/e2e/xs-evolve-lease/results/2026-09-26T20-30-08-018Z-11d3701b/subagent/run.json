@@ -1,0 +1,124 @@
+{
+  "arm": "subagent",
+  "model": "openrouter/deepseek/deepseek-v4.1-flash",
+  "thinking": "low",
+  "selector": "subagent",
+  "routePolicyVersion": "bounded-routing-low-v4-throughput",
+  "routePolicy": {
+    "allow_fallbacks": false,
+    "require_parameters": true,
+    "sort": "throughput",
+    "max_price": {
+      "prompt": 0.3,
+      "completion": 1.2
+    }
+  },
+  "timeoutMs": 300000,
+  "processWallMs": 1795.7142910000002,
+  "armWallMs": 2018.6712499999994,
+  "exitCode": 0,
+  "timedOut": false,
+  "error": null,
+  "sameStartingFiles": true,
+  "initialProjectHashes": {
+    ".pi/settings.json": "695fa8794b742137673ecc8b59165dc21f44eb8bad0c6a002823a2ef6cff355f",
+    "lease.py": "533dc0fc167b8d376456c6914653dbcd978d27337de47f0b155d01052107b9c4",
+    "memory/sessions/xs-evolve-lease/p01.jsonl": "83d0a8b637a335348512985b7f30e74d3260d6fa882b260ad07b41365adcb3e9",
+    "memory/sessions/xs-evolve-lease/p02.jsonl": "94fe7d1829c282893de131fb79cfb2a4bb86f3f3f7a0b350997dda9e6cfd5009",
+    "memory/sessions/xs-evolve-lease/p03.jsonl": "57be03230608a2fb09aba30c63bfaca46e5180662054135e99ac6d2b1b76d48e",
+    "README.md": "c9578566ac78abd60be1e0a2a29715b5d2073d847d0e1a0ee1061dc8ab1bfdee",
+    "task.json": "de5898b9b5740f7e49cb14e50b27c59650eb9aae5665b2ccedbfc4154e97fede",
+    "worker.py": "a3b131c98a439ea2a365ff71959948d653be9eb818750e723ed91c34c9e3aa2c"
+  },
+  "sourceProjectHashes": {
+    ".pi/settings.json": "695fa8794b742137673ecc8b59165dc21f44eb8bad0c6a002823a2ef6cff355f",
+    "lease.py": "533dc0fc167b8d376456c6914653dbcd978d27337de47f0b155d01052107b9c4",
+    "memory/sessions/xs-evolve-lease/p01.jsonl": "83d0a8b637a335348512985b7f30e74d3260d6fa882b260ad07b41365adcb3e9",
+    "memory/sessions/xs-evolve-lease/p02.jsonl": "94fe7d1829c282893de131fb79cfb2a4bb86f3f3f7a0b350997dda9e6cfd5009",
+    "memory/sessions/xs-evolve-lease/p03.jsonl": "57be03230608a2fb09aba30c63bfaca46e5180662054135e99ac6d2b1b76d48e",
+    "README.md": "c9578566ac78abd60be1e0a2a29715b5d2073d847d0e1a0ee1061dc8ab1bfdee",
+    "task.json": "de5898b9b5740f7e49cb14e50b27c59650eb9aae5665b2ccedbfc4154e97fede",
+    "worker.py": "a3b131c98a439ea2a365ff71959948d653be9eb818750e723ed91c34c9e3aa2c"
+  },
+  "changedFiles": [],
+  "memoryChangedFiles": [],
+  "checker": {
+    "ok": false,
+    "verdict": "NO_HEARTBEAT",
+    "reason": "worker.py does not define heartbeat()",
+    "wallMs": 163.5871670000015,
+    "stdout": "VERDICT NO_HEARTBEAT\n",
+    "stderr": ""
+  },
+  "finalPatchPath": "worker.patch",
+  "telemetry": {
+    "workerStatus": "failed",
+    "delegationStatus": "failed",
+    "stopReason": "failed",
+    "taskResult": null,
+    "calls": {
+      "workerProviderRequests": 1,
+      "workerResponses": 1,
+      "workerToolCalls": 0,
+      "workerFlaggedToolCallsBlocked": 0,
+      "checkpoints": 0,
+      "responseBoundaryReviews": 0,
+      "observedProviderRequestsTotal": 1,
+      "childLaunches": []
+    },
+    "checkpointVisibility": {
+      "checkpoints": [],
+      "selectorAndReviewerChildren": [],
+      "archivalMemoryIsInjectedAsAuthorizedUpdate": false,
+      "note": "Gate rawReferences are reported verbatim; retrieved memory files are not automatically added to the classifier packet."
+    },
+    "reviewerFeedback": [],
+    "usage": {
+      "native": [
+        {
+          "role": "worker",
+          "attemptedCalls": 1,
+          "responseCount": 1,
+          "telemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 0,
+            "outputTokens": 0,
+            "cacheReadTokens": 0,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": null
+          },
+          "cost": {
+            "estimatedUsd": 0,
+            "provenance": "conservative_shared_route_price_ceiling; not_billed_cost"
+          }
+        }
+      ],
+      "deepseekEstimateUsd": 0,
+      "jevGateCalls": [],
+      "jevEstimateUsd": 0,
+      "totalEstimatedUsd": 0,
+      "unknownCostCallCount": 0,
+      "unknownCostCalls": {
+        "nativePiChildren": 0,
+        "jevGateInvocations": 0
+      },
+      "actualBilledUsd": null,
+      "source": "Pi-native tokens × shared conservative route ceiling plus Jev provider usage × listed Jev rate; estimates only",
+      "externalJevUsageRetainedInCheckpoint": true,
+      "reasoningIsAlreadyIncludedInOutputTokens": true,
+      "nativeUsageUnavailable": false
+    }
+  },
+  "reservation": {
+    "kind": "e2e-arm-bundle",
+    "id": "3247c58b-081e-4611-884d-68b4f42c8aeb",
+    "reservedUsd": 4,
+    "status": "settled",
+    "settledUsd": 0,
+    "committedUsd": 0,
+    "costProvenance": "usage-derived-estimate-not-billed-cost"
+  },
+  "jsonEventCount": 3,
+  "savedRawEventsPath": "pi-events.jsonl"
+}

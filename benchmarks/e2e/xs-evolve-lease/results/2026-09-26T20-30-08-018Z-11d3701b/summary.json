@@ -1,0 +1,58 @@
+{
+  "demo": "xs-evolve-lease",
+  "runRoot": "/Users/henry/Documents/ChatGPT/mongo hack/benchmarks/e2e/xs-evolve-lease/results/2026-09-26T20-30-08-018Z-11d3701b",
+  "startedAt": "2026-09-26T20-30-08-018Z",
+  "sourceCommit": "ee23ad22026ab63213c2282949cd5b9b6097664b",
+  "arms": [
+    {
+      "arm": "jev",
+      "passedChecker": false,
+      "status": "failed",
+      "processWallMs": 24720.176874999997,
+      "armWallMs": 24975.015333,
+      "checkpoints": 6,
+      "providerRequestsObservedTotal": 11,
+      "estimatedUsd": null,
+      "reservationId": "51471ac9-acc0-4c4e-8fd2-f6e9fe85c277",
+      "reservationStatus": "reserved_unknown_cost",
+      "changedFiles": [],
+      "memoryChangedFiles": [],
+      "outputDir": "/Users/henry/Documents/ChatGPT/mongo hack/benchmarks/e2e/xs-evolve-lease/results/2026-09-26T20-30-08-018Z-11d3701b/jev"
+    },
+    {
+      "arm": "subagent",
+      "passedChecker": false,
+      "status": "failed",
+      "processWallMs": 1795.7142910000002,
+      "armWallMs": 2018.6712499999994,
+      "checkpoints": 0,
+      "providerRequestsObservedTotal": 1,
+      "estimatedUsd": 0,
+      "reservationId": "3247c58b-081e-4611-884d-68b4f42c8aeb",
+      "reservationStatus": "settled",
+      "changedFiles": [],
+      "memoryChangedFiles": [],
+      "outputDir": "/Users/henry/Documents/ChatGPT/mongo hack/benchmarks/e2e/xs-evolve-lease/results/2026-09-26T20-30-08-018Z-11d3701b/subagent"
+    }
+  ],
+  "checkerContract": "upstream fake-clock callback checker; not a live lease safety test",
+  "totalWallMs": 27003.463458,
+  "reservations": [
+    {
+      "id": "51471ac9-acc0-4c4e-8fd2-f6e9fe85c277",
+      "kind": "e2e-arm-bundle",
+      "selector": "jev",
+      "reservedUsd": 4,
+      "status": "reserved"
+    },
+    {
+      "id": "3247c58b-081e-4611-884d-68b4f42c8aeb",
+      "kind": "e2e-arm-bundle",
+      "selector": "subagent",
+      "reservedUsd": 4,
+      "status": "completed"
+    }
+  ],
+  "ledgerSnapshotPath": "ledger-after-arms.json",
+  "costAccounting": "conservative DeepSeek route-ceiling estimates plus Jev listed-rate estimates where usage is known; actual billed cost unknown"
+}

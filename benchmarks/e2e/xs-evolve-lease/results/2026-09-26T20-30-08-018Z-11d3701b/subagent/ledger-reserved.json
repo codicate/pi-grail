@@ -852,23 +852,11 @@
       "reservedUsd": 4,
       "phase": "development",
       "id": "3247c58b-081e-4611-884d-68b4f42c8aeb",
-      "status": "completed",
-      "startedAt": "2026-09-26T20:30:08.019Z",
-      "settledUsd": 0,
-      "committedUsd": 0,
-      "costProvenance": "usage-derived-estimate-not-billed-cost",
-      "settledAt": "2026-09-26T20:30:35.015Z"
-    },
-    {
-      "kind": "e2e-arm-bundle",
-      "selector": "subagent",
-      "caseId": "xs-evolve-lease-live-demo:zero-usage-correction",
-      "promptHash": "249d82a6ceb6fd8bb84c7d3d55b9ad977c02702a4d3093b4d85c463d317cde35",
-      "reservedUsd": 4,
-      "phase": "development",
-      "id": "dac6ee0e-dc6d-4a92-9b50-d203e5b75dae",
       "status": "reserved",
-      "startedAt": "2026-09-26T20:34:03.772Z"
+      "startedAt": "2026-09-26T20:30:08.019Z"
     }
-  ]
+  ],
+  "spentOrReservedUsd": 8.088795282,
+  "developmentAvailableUsd": 1.7112047180000012,
+  "totalAvailableUsd": 1.9112047180000005
 }

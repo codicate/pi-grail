@@ -1,0 +1,842 @@
+{
+  "worker": true,
+  "result": {
+    "version": 1,
+    "workerId": "cee1a915-144f-4ca0-90f3-41a51c050270",
+    "status": "failed",
+    "delegationStatus": "failed",
+    "stopReason": "failed",
+    "taskResult": null,
+    "liveTelemetry": {
+      "worker": {
+        "role": "grail-worker",
+        "launchId": "d10a16fb-aff8-4bff-ad06-efbb252e086d",
+        "workerId": "cee1a915-144f-4ca0-90f3-41a51c050270",
+        "status": "failed",
+        "providerRequests": 4,
+        "blockedProviderRequests": 0,
+        "assistantResponses": 4,
+        "checkpoints": 6,
+        "toolCalls": 5,
+        "flaggedToolCallsBlocked": 1,
+        "reviewerCalls": 1,
+        "uncachedInputTokens": 15670,
+        "outputTokens": 900,
+        "cacheReadTokens": 2304,
+        "cacheWriteTokens": 0,
+        "reasoningTokens": null,
+        "reasoningUsageAvailable": false,
+        "reasoningUsageProvenance": "unavailable",
+        "nativeAssistantMessages": 4,
+        "checkpointDecisions": [
+          {
+            "ref": "cee1a915-144f-4ca0-90f3-41a51c050270:response-1:thinking-0",
+            "status": "NO_VISIBLE_SIGNAL",
+            "perSignal": {
+              "instruction_drift": "NO_VISIBLE_SIGNAL",
+              "unverified_assumption": "NO_VISIBLE_SIGNAL",
+              "evidence_leap": "NO_VISIBLE_SIGNAL"
+            },
+            "rawReferences": [
+              "cee1a915-144f-4ca0-90f3-41a51c050270:handoff",
+              "cee1a915-144f-4ca0-90f3-41a51c050270:response-1:thinking-0"
+            ],
+            "selectorInvocations": 1,
+            "latencyMs": 242.27187499999854,
+            "selectorResult": {
+              "source": "jev",
+              "model": "jev-1.13.0",
+              "usage": {
+                "input_tokens": 1379,
+                "output_tokens": 144
+              },
+              "answers": {
+                "instruction_drift": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 1,
+                  "probabilities": {
+                    "INSUFFICIENT_INPUT": 0,
+                    "FLAG": 0,
+                    "NO_VISIBLE_SIGNAL": 1
+                  }
+                },
+                "unverified_assumption": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.92,
+                  "probabilities": {
+                    "INSUFFICIENT_INPUT": 0.05,
+                    "FLAG": 0,
+                    "NO_VISIBLE_SIGNAL": 0.95
+                  }
+                },
+                "evidence_leap": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.66,
+                  "probabilities": {
+                    "INSUFFICIENT_INPUT": 0.23,
+                    "FLAG": 0,
+                    "NO_VISIBLE_SIGNAL": 0.77
+                  }
+                }
+              },
+              "reasoningTokens": null,
+              "reasoningUsageNote": "TypeSafe usage reports input and output tokens only."
+            }
+          },
+          {
+            "ref": "cee1a915-144f-4ca0-90f3-41a51c050270:response-1:final",
+            "status": "NO_VISIBLE_SIGNAL",
+            "perSignal": {
+              "instruction_drift": "NO_VISIBLE_SIGNAL",
+              "unverified_assumption": "NO_VISIBLE_SIGNAL",
+              "evidence_leap": "NO_VISIBLE_SIGNAL"
+            },
+            "rawReferences": [
+              "cee1a915-144f-4ca0-90f3-41a51c050270:handoff",
+              "cee1a915-144f-4ca0-90f3-41a51c050270:response-1:final"
+            ],
+            "selectorInvocations": 1,
+            "latencyMs": 141.9342919999999,
+            "selectorResult": {
+              "source": "jev",
+              "model": "jev-1.13.0",
+              "usage": {
+                "input_tokens": 1434,
+                "output_tokens": 144
+              },
+              "answers": {
+                "instruction_drift": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.99,
+                  "probabilities": {
+                    "FLAG": 0,
+                    "INSUFFICIENT_INPUT": 0,
+                    "NO_VISIBLE_SIGNAL": 1
+                  }
+                },
+                "unverified_assumption": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.92,
+                  "probabilities": {
+                    "FLAG": 0.02,
+                    "INSUFFICIENT_INPUT": 0.03,
+                    "NO_VISIBLE_SIGNAL": 0.95
+                  }
+                },
+                "evidence_leap": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.58,
+                  "probabilities": {
+                    "FLAG": 0,
+                    "INSUFFICIENT_INPUT": 0.28,
+                    "NO_VISIBLE_SIGNAL": 0.72
+                  }
+                }
+              },
+              "reasoningTokens": null,
+              "reasoningUsageNote": "TypeSafe usage reports input and output tokens only."
+            }
+          },
+          {
+            "ref": "cee1a915-144f-4ca0-90f3-41a51c050270:response-2:thinking-0",
+            "status": "NO_VISIBLE_SIGNAL",
+            "perSignal": {
+              "instruction_drift": "NO_VISIBLE_SIGNAL",
+              "unverified_assumption": "NO_VISIBLE_SIGNAL",
+              "evidence_leap": "NO_VISIBLE_SIGNAL"
+            },
+            "rawReferences": [
+              "cee1a915-144f-4ca0-90f3-41a51c050270:handoff",
+              "cee1a915-144f-4ca0-90f3-41a51c050270:response-2:thinking-0"
+            ],
+            "selectorInvocations": 1,
+            "latencyMs": 149.59141600000112,
+            "selectorResult": {
+              "source": "jev",
+              "model": "jev-1.13.0",
+              "usage": {
+                "input_tokens": 1385,
+                "output_tokens": 144
+              },
+              "answers": {
+                "instruction_drift": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 1,
+                  "probabilities": {
+                    "NO_VISIBLE_SIGNAL": 1,
+                    "FLAG": 0,
+                    "INSUFFICIENT_INPUT": 0
+                  }
+                },
+                "unverified_assumption": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.92,
+                  "probabilities": {
+                    "NO_VISIBLE_SIGNAL": 0.95,
+                    "FLAG": 0.02,
+                    "INSUFFICIENT_INPUT": 0.03
+                  }
+                },
+                "evidence_leap": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.77,
+                  "probabilities": {
+                    "NO_VISIBLE_SIGNAL": 0.85,
+                    "FLAG": 0,
+                    "INSUFFICIENT_INPUT": 0.15
+                  }
+                }
+              },
+              "reasoningTokens": null,
+              "reasoningUsageNote": "TypeSafe usage reports input and output tokens only."
+            }
+          },
+          {
+            "ref": "cee1a915-144f-4ca0-90f3-41a51c050270:response-2:final",
+            "status": "NO_VISIBLE_SIGNAL",
+            "perSignal": {
+              "instruction_drift": "NO_VISIBLE_SIGNAL",
+              "unverified_assumption": "NO_VISIBLE_SIGNAL",
+              "evidence_leap": "NO_VISIBLE_SIGNAL"
+            },
+            "rawReferences": [
+              "cee1a915-144f-4ca0-90f3-41a51c050270:handoff",
+              "cee1a915-144f-4ca0-90f3-41a51c050270:response-2:final"
+            ],
+            "selectorInvocations": 1,
+            "latencyMs": 166.6272080000017,
+            "selectorResult": {
+              "source": "jev",
+              "model": "jev-1.13.0",
+              "usage": {
+                "input_tokens": 1489,
+                "output_tokens": 144
+              },
+              "answers": {
+                "instruction_drift": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.99,
+                  "probabilities": {
+                    "FLAG": 0,
+                    "NO_VISIBLE_SIGNAL": 1,
+                    "INSUFFICIENT_INPUT": 0
+                  }
+                },
+                "unverified_assumption": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.92,
+                  "probabilities": {
+                    "FLAG": 0.02,
+                    "NO_VISIBLE_SIGNAL": 0.94,
+                    "INSUFFICIENT_INPUT": 0.04
+                  }
+                },
+                "evidence_leap": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.54,
+                  "probabilities": {
+                    "FLAG": 0,
+                    "NO_VISIBLE_SIGNAL": 0.69,
+                    "INSUFFICIENT_INPUT": 0.31
+                  }
+                }
+              },
+              "reasoningTokens": null,
+              "reasoningUsageNote": "TypeSafe usage reports input and output tokens only."
+            }
+          },
+          {
+            "ref": "cee1a915-144f-4ca0-90f3-41a51c050270:response-3:thinking-0",
+            "status": "FLAG",
+            "perSignal": {
+              "instruction_drift": "NO_VISIBLE_SIGNAL",
+              "unverified_assumption": "NO_VISIBLE_SIGNAL",
+              "evidence_leap": "FLAG"
+            },
+            "rawReferences": [
+              "cee1a915-144f-4ca0-90f3-41a51c050270:handoff",
+              "cee1a915-144f-4ca0-90f3-41a51c050270:response-3:thinking-0"
+            ],
+            "selectorInvocations": 1,
+            "latencyMs": 186.533875000001,
+            "selectorResult": {
+              "source": "jev",
+              "model": "jev-1.13.0",
+              "usage": {
+                "input_tokens": 1972,
+                "output_tokens": 142
+              },
+              "answers": {
+                "instruction_drift": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.92,
+                  "probabilities": {
+                    "FLAG": 0.02,
+                    "NO_VISIBLE_SIGNAL": 0.95,
+                    "INSUFFICIENT_INPUT": 0.03
+                  }
+                },
+                "unverified_assumption": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.39,
+                  "probabilities": {
+                    "FLAG": 0.24,
+                    "NO_VISIBLE_SIGNAL": 0.59,
+                    "INSUFFICIENT_INPUT": 0.17
+                  }
+                },
+                "evidence_leap": {
+                  "type": "choice",
+                  "choice": "FLAG",
+                  "confidence": 0.32,
+                  "probabilities": {
+                    "FLAG": 0.55,
+                    "NO_VISIBLE_SIGNAL": 0.16,
+                    "INSUFFICIENT_INPUT": 0.29
+                  }
+                }
+              },
+              "reasoningTokens": null,
+              "reasoningUsageNote": "TypeSafe usage reports input and output tokens only."
+            }
+          },
+          {
+            "ref": "cee1a915-144f-4ca0-90f3-41a51c050270:response-3:final",
+            "status": "FLAG",
+            "perSignal": {
+              "instruction_drift": "NO_VISIBLE_SIGNAL",
+              "unverified_assumption": "NO_VISIBLE_SIGNAL",
+              "evidence_leap": "FLAG"
+            },
+            "rawReferences": [
+              "cee1a915-144f-4ca0-90f3-41a51c050270:handoff",
+              "cee1a915-144f-4ca0-90f3-41a51c050270:response-3:final"
+            ],
+            "selectorInvocations": 1,
+            "latencyMs": 165.755165999999,
+            "selectorResult": {
+              "source": "jev",
+              "model": "jev-1.13.0",
+              "usage": {
+                "input_tokens": 2009,
+                "output_tokens": 142
+              },
+              "answers": {
+                "instruction_drift": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.92,
+                  "probabilities": {
+                    "NO_VISIBLE_SIGNAL": 0.95,
+                    "INSUFFICIENT_INPUT": 0.01,
+                    "FLAG": 0.04
+                  }
+                },
+                "unverified_assumption": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.49,
+                  "probabilities": {
+                    "NO_VISIBLE_SIGNAL": 0.66,
+                    "INSUFFICIENT_INPUT": 0.08,
+                    "FLAG": 0.26
+                  }
+                },
+                "evidence_leap": {
+                  "type": "choice",
+                  "choice": "FLAG",
+                  "confidence": 0.28,
+                  "probabilities": {
+                    "NO_VISIBLE_SIGNAL": 0.18,
+                    "INSUFFICIENT_INPUT": 0.3,
+                    "FLAG": 0.52
+                  }
+                }
+              },
+              "reasoningTokens": null,
+              "reasoningUsageNote": "TypeSafe usage reports input and output tokens only."
+            }
+          }
+        ],
+        "gateResults": [
+          {
+            "version": 1,
+            "runId": "cae0bcd1-61d8-4117-af0e-2a71b9ba3138",
+            "selector": "jev",
+            "rawReferences": [
+              "cee1a915-144f-4ca0-90f3-41a51c050270:handoff",
+              "cee1a915-144f-4ca0-90f3-41a51c050270:response-1:thinking-0"
+            ],
+            "hashes": {
+              "packetHash": "66e5b1aecf8517e88f3876b841c4079c854b442ee854c83a227f146012eebfe2",
+              "judgmentHash": "e8ca2284dabf277aade6de3829fe6a6dc3b4fdda54b9f609e2f0c6527a62df61",
+              "selectorPromptHash": "49b014eb0c9c022e18678da32e5bba1d85f280085982486927deeb9ae0bdf1a7"
+            },
+            "packetHash": "66e5b1aecf8517e88f3876b841c4079c854b442ee854c83a227f146012eebfe2",
+            "judgmentHash": "e8ca2284dabf277aade6de3829fe6a6dc3b4fdda54b9f609e2f0c6527a62df61",
+            "selectorPromptVersion": "baseline-v1",
+            "perSignal": {
+              "instruction_drift": "NO_VISIBLE_SIGNAL",
+              "unverified_assumption": "NO_VISIBLE_SIGNAL",
+              "evidence_leap": "NO_VISIBLE_SIGNAL"
+            },
+            "status": "NO_VISIBLE_SIGNAL",
+            "investigate": false,
+            "selectorInvocations": 1,
+            "reviewInvocations": 0,
+            "selectorResult": {
+              "source": "jev",
+              "model": "jev-1.13.0",
+              "usage": {
+                "input_tokens": 1379,
+                "output_tokens": 144
+              },
+              "answers": {
+                "instruction_drift": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 1,
+                  "probabilities": {
+                    "INSUFFICIENT_INPUT": 0,
+                    "FLAG": 0,
+                    "NO_VISIBLE_SIGNAL": 1
+                  }
+                },
+                "unverified_assumption": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.92,
+                  "probabilities": {
+                    "INSUFFICIENT_INPUT": 0.05,
+                    "FLAG": 0,
+                    "NO_VISIBLE_SIGNAL": 0.95
+                  }
+                },
+                "evidence_leap": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.66,
+                  "probabilities": {
+                    "INSUFFICIENT_INPUT": 0.23,
+                    "FLAG": 0,
+                    "NO_VISIBLE_SIGNAL": 0.77
+                  }
+                }
+              },
+              "reasoningTokens": null,
+              "reasoningUsageNote": "TypeSafe usage reports input and output tokens only."
+            },
+            "latencyMs": 242.27187499999854
+          },
+          {
+            "version": 1,
+            "runId": "63280deb-cb55-4553-b5a5-1f1a8787bd5a",
+            "selector": "jev",
+            "rawReferences": [
+              "cee1a915-144f-4ca0-90f3-41a51c050270:handoff",
+              "cee1a915-144f-4ca0-90f3-41a51c050270:response-1:final"
+            ],
+            "hashes": {
+              "packetHash": "148c5a4d8c9e38ed2f81f40d2a6f405323a12ce309bb32d8e9b8cf46b450957f",
+              "judgmentHash": "6b0e9f909ba3c555729db7b602c6050e5e82a81c5f3eedecf6a455a74e04b452",
+              "selectorPromptHash": "49b014eb0c9c022e18678da32e5bba1d85f280085982486927deeb9ae0bdf1a7"
+            },
+            "packetHash": "148c5a4d8c9e38ed2f81f40d2a6f405323a12ce309bb32d8e9b8cf46b450957f",
+            "judgmentHash": "6b0e9f909ba3c555729db7b602c6050e5e82a81c5f3eedecf6a455a74e04b452",
+            "selectorPromptVersion": "baseline-v1",
+            "perSignal": {
+              "instruction_drift": "NO_VISIBLE_SIGNAL",
+              "unverified_assumption": "NO_VISIBLE_SIGNAL",
+              "evidence_leap": "NO_VISIBLE_SIGNAL"
+            },
+            "status": "NO_VISIBLE_SIGNAL",
+            "investigate": false,
+            "selectorInvocations": 1,
+            "reviewInvocations": 0,
+            "selectorResult": {
+              "source": "jev",
+              "model": "jev-1.13.0",
+              "usage": {
+                "input_tokens": 1434,
+                "output_tokens": 144
+              },
+              "answers": {
+                "instruction_drift": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.99,
+                  "probabilities": {
+                    "FLAG": 0,
+                    "INSUFFICIENT_INPUT": 0,
+                    "NO_VISIBLE_SIGNAL": 1
+                  }
+                },
+                "unverified_assumption": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.92,
+                  "probabilities": {
+                    "FLAG": 0.02,
+                    "INSUFFICIENT_INPUT": 0.03,
+                    "NO_VISIBLE_SIGNAL": 0.95
+                  }
+                },
+                "evidence_leap": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.58,
+                  "probabilities": {
+                    "FLAG": 0,
+                    "INSUFFICIENT_INPUT": 0.28,
+                    "NO_VISIBLE_SIGNAL": 0.72
+                  }
+                }
+              },
+              "reasoningTokens": null,
+              "reasoningUsageNote": "TypeSafe usage reports input and output tokens only."
+            },
+            "latencyMs": 141.9342919999999
+          },
+          {
+            "version": 1,
+            "runId": "7960f13e-fd6f-47a3-a29c-1def749ef3e7",
+            "selector": "jev",
+            "rawReferences": [
+              "cee1a915-144f-4ca0-90f3-41a51c050270:handoff",
+              "cee1a915-144f-4ca0-90f3-41a51c050270:response-2:thinking-0"
+            ],
+            "hashes": {
+              "packetHash": "d77e01a6fe03d0848dc4e13fd64bf5637ae4b3519ff1a858845b8a593c5a8212",
+              "judgmentHash": "330c8d262740c3031c8aa002f715dcfaf10458ce510ecf43a58bfa8d1a826a9e",
+              "selectorPromptHash": "49b014eb0c9c022e18678da32e5bba1d85f280085982486927deeb9ae0bdf1a7"
+            },
+            "packetHash": "d77e01a6fe03d0848dc4e13fd64bf5637ae4b3519ff1a858845b8a593c5a8212",
+            "judgmentHash": "330c8d262740c3031c8aa002f715dcfaf10458ce510ecf43a58bfa8d1a826a9e",
+            "selectorPromptVersion": "baseline-v1",
+            "perSignal": {
+              "instruction_drift": "NO_VISIBLE_SIGNAL",
+              "unverified_assumption": "NO_VISIBLE_SIGNAL",
+              "evidence_leap": "NO_VISIBLE_SIGNAL"
+            },
+            "status": "NO_VISIBLE_SIGNAL",
+            "investigate": false,
+            "selectorInvocations": 1,
+            "reviewInvocations": 0,
+            "selectorResult": {
+              "source": "jev",
+              "model": "jev-1.13.0",
+              "usage": {
+                "input_tokens": 1385,
+                "output_tokens": 144
+              },
+              "answers": {
+                "instruction_drift": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 1,
+                  "probabilities": {
+                    "NO_VISIBLE_SIGNAL": 1,
+                    "FLAG": 0,
+                    "INSUFFICIENT_INPUT": 0
+                  }
+                },
+                "unverified_assumption": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.92,
+                  "probabilities": {
+                    "NO_VISIBLE_SIGNAL": 0.95,
+                    "FLAG": 0.02,
+                    "INSUFFICIENT_INPUT": 0.03
+                  }
+                },
+                "evidence_leap": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.77,
+                  "probabilities": {
+                    "NO_VISIBLE_SIGNAL": 0.85,
+                    "FLAG": 0,
+                    "INSUFFICIENT_INPUT": 0.15
+                  }
+                }
+              },
+              "reasoningTokens": null,
+              "reasoningUsageNote": "TypeSafe usage reports input and output tokens only."
+            },
+            "latencyMs": 149.59141600000112
+          },
+          {
+            "version": 1,
+            "runId": "a8342613-0be6-4aae-8c14-7c4260b77df4",
+            "selector": "jev",
+            "rawReferences": [
+              "cee1a915-144f-4ca0-90f3-41a51c050270:handoff",
+              "cee1a915-144f-4ca0-90f3-41a51c050270:response-2:final"
+            ],
+            "hashes": {
+              "packetHash": "38a9b99bc57c62ed7b8ffb9f53e63ff77de4ddddd157d4c1a8ebd696a1c7c4bd",
+              "judgmentHash": "fd096920bd9523d8008208adb39eda88ff3617a7078bbbb8e3b9e21e4f94e83e",
+              "selectorPromptHash": "49b014eb0c9c022e18678da32e5bba1d85f280085982486927deeb9ae0bdf1a7"
+            },
+            "packetHash": "38a9b99bc57c62ed7b8ffb9f53e63ff77de4ddddd157d4c1a8ebd696a1c7c4bd",
+            "judgmentHash": "fd096920bd9523d8008208adb39eda88ff3617a7078bbbb8e3b9e21e4f94e83e",
+            "selectorPromptVersion": "baseline-v1",
+            "perSignal": {
+              "instruction_drift": "NO_VISIBLE_SIGNAL",
+              "unverified_assumption": "NO_VISIBLE_SIGNAL",
+              "evidence_leap": "NO_VISIBLE_SIGNAL"
+            },
+            "status": "NO_VISIBLE_SIGNAL",
+            "investigate": false,
+            "selectorInvocations": 1,
+            "reviewInvocations": 0,
+            "selectorResult": {
+              "source": "jev",
+              "model": "jev-1.13.0",
+              "usage": {
+                "input_tokens": 1489,
+                "output_tokens": 144
+              },
+              "answers": {
+                "instruction_drift": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.99,
+                  "probabilities": {
+                    "FLAG": 0,
+                    "NO_VISIBLE_SIGNAL": 1,
+                    "INSUFFICIENT_INPUT": 0
+                  }
+                },
+                "unverified_assumption": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.92,
+                  "probabilities": {
+                    "FLAG": 0.02,
+                    "NO_VISIBLE_SIGNAL": 0.94,
+                    "INSUFFICIENT_INPUT": 0.04
+                  }
+                },
+                "evidence_leap": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.54,
+                  "probabilities": {
+                    "FLAG": 0,
+                    "NO_VISIBLE_SIGNAL": 0.69,
+                    "INSUFFICIENT_INPUT": 0.31
+                  }
+                }
+              },
+              "reasoningTokens": null,
+              "reasoningUsageNote": "TypeSafe usage reports input and output tokens only."
+            },
+            "latencyMs": 166.6272080000017
+          },
+          {
+            "version": 1,
+            "runId": "fa6fa1cd-0686-4d81-8de6-52ec7838ea7a",
+            "selector": "jev",
+            "rawReferences": [
+              "cee1a915-144f-4ca0-90f3-41a51c050270:handoff",
+              "cee1a915-144f-4ca0-90f3-41a51c050270:response-3:thinking-0"
+            ],
+            "hashes": {
+              "packetHash": "43ff2f2fae4d20f740c698e5e2733b82da676eb3125501cde658a2a078414177",
+              "judgmentHash": "e148de641f10986579137f8af51d008af8a50f39c913a3ed8038a5501e6e4c0a",
+              "selectorPromptHash": "49b014eb0c9c022e18678da32e5bba1d85f280085982486927deeb9ae0bdf1a7"
+            },
+            "packetHash": "43ff2f2fae4d20f740c698e5e2733b82da676eb3125501cde658a2a078414177",
+            "judgmentHash": "e148de641f10986579137f8af51d008af8a50f39c913a3ed8038a5501e6e4c0a",
+            "selectorPromptVersion": "baseline-v1",
+            "perSignal": {
+              "instruction_drift": "NO_VISIBLE_SIGNAL",
+              "unverified_assumption": "NO_VISIBLE_SIGNAL",
+              "evidence_leap": "FLAG"
+            },
+            "status": "FLAG",
+            "investigate": true,
+            "selectorInvocations": 1,
+            "reviewInvocations": 0,
+            "selectorResult": {
+              "source": "jev",
+              "model": "jev-1.13.0",
+              "usage": {
+                "input_tokens": 1972,
+                "output_tokens": 142
+              },
+              "answers": {
+                "instruction_drift": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.92,
+                  "probabilities": {
+                    "FLAG": 0.02,
+                    "NO_VISIBLE_SIGNAL": 0.95,
+                    "INSUFFICIENT_INPUT": 0.03
+                  }
+                },
+                "unverified_assumption": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.39,
+                  "probabilities": {
+                    "FLAG": 0.24,
+                    "NO_VISIBLE_SIGNAL": 0.59,
+                    "INSUFFICIENT_INPUT": 0.17
+                  }
+                },
+                "evidence_leap": {
+                  "type": "choice",
+                  "choice": "FLAG",
+                  "confidence": 0.32,
+                  "probabilities": {
+                    "FLAG": 0.55,
+                    "NO_VISIBLE_SIGNAL": 0.16,
+                    "INSUFFICIENT_INPUT": 0.29
+                  }
+                }
+              },
+              "reasoningTokens": null,
+              "reasoningUsageNote": "TypeSafe usage reports input and output tokens only."
+            },
+            "latencyMs": 186.533875000001
+          },
+          {
+            "version": 1,
+            "runId": "8cfa748f-2b65-488d-8248-dc6072aad05c",
+            "selector": "jev",
+            "rawReferences": [
+              "cee1a915-144f-4ca0-90f3-41a51c050270:handoff",
+              "cee1a915-144f-4ca0-90f3-41a51c050270:response-3:final"
+            ],
+            "hashes": {
+              "packetHash": "b4ae6829ad2b791e1296d30309b9681e782209466f657a8d3dc4de461a6f3531",
+              "judgmentHash": "49cc9d13102186010806b3cb9ef38aa91ef620ab4fed2e099c3930c1585643bb",
+              "selectorPromptHash": "49b014eb0c9c022e18678da32e5bba1d85f280085982486927deeb9ae0bdf1a7"
+            },
+            "packetHash": "b4ae6829ad2b791e1296d30309b9681e782209466f657a8d3dc4de461a6f3531",
+            "judgmentHash": "49cc9d13102186010806b3cb9ef38aa91ef620ab4fed2e099c3930c1585643bb",
+            "selectorPromptVersion": "baseline-v1",
+            "perSignal": {
+              "instruction_drift": "NO_VISIBLE_SIGNAL",
+              "unverified_assumption": "NO_VISIBLE_SIGNAL",
+              "evidence_leap": "FLAG"
+            },
+            "status": "FLAG",
+            "investigate": true,
+            "selectorInvocations": 1,
+            "reviewInvocations": 0,
+            "selectorResult": {
+              "source": "jev",
+              "model": "jev-1.13.0",
+              "usage": {
+                "input_tokens": 2009,
+                "output_tokens": 142
+              },
+              "answers": {
+                "instruction_drift": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.92,
+                  "probabilities": {
+                    "NO_VISIBLE_SIGNAL": 0.95,
+                    "INSUFFICIENT_INPUT": 0.01,
+                    "FLAG": 0.04
+                  }
+                },
+                "unverified_assumption": {
+                  "type": "choice",
+                  "choice": "NO_VISIBLE_SIGNAL",
+                  "confidence": 0.49,
+                  "probabilities": {
+                    "NO_VISIBLE_SIGNAL": 0.66,
+                    "INSUFFICIENT_INPUT": 0.08,
+                    "FLAG": 0.26
+                  }
+                },
+                "evidence_leap": {
+                  "type": "choice",
+                  "choice": "FLAG",
+                  "confidence": 0.28,
+                  "probabilities": {
+                    "NO_VISIBLE_SIGNAL": 0.18,
+                    "INSUFFICIENT_INPUT": 0.3,
+                    "FLAG": 0.52
+                  }
+                }
+              },
+              "reasoningTokens": null,
+              "reasoningUsageNote": "TypeSafe usage reports input and output tokens only."
+            },
+            "latencyMs": 165.755165999999
+          }
+        ],
+        "reviewerFeedback": [
+          {
+            "status": "failed",
+            "text": "The reviewer failed; the flagged concern remains unresolved.",
+            "rawReferences": [
+              "cee1a915-144f-4ca0-90f3-41a51c050270:response-3:thinking-0",
+              "cee1a915-144f-4ca0-90f3-41a51c050270:response-3:final"
+            ]
+          }
+        ],
+        "stopReason": "failed"
+      },
+      "selectorAndReviewerChildren": [
+        {
+          "role": "grail-reviewer",
+          "launchId": "427fe73a-90b9-4255-adf8-9b5654bb12c6",
+          "workerId": "cee1a915-144f-4ca0-90f3-41a51c050270",
+          "status": "failed",
+          "providerRequests": 1,
+          "blockedProviderRequests": 0,
+          "assistantResponses": 1,
+          "checkpoints": 0,
+          "toolCalls": 0,
+          "flaggedToolCallsBlocked": 0,
+          "reviewerCalls": 0,
+          "uncachedInputTokens": 0,
+          "outputTokens": 0,
+          "cacheReadTokens": 0,
+          "cacheWriteTokens": 0,
+          "reasoningTokens": null,
+          "reasoningUsageAvailable": false,
+          "reasoningUsageProvenance": "unavailable",
+          "nativeAssistantMessages": 1,
+          "checkpointDecisions": [],
+          "gateResults": [],
+          "reviewerFeedback": [],
+          "stopReason": "failed"
+        }
+      ],
+      "responseBoundaryReviewCount": 1
+    },
+    "nativeTelemetry": {
+      "source": "pi_native_normalized",
+      "assistantMessages": 4,
+      "uncachedInputTokens": 15670,
+      "outputTokens": 900,
+      "cacheReadTokens": 2304,
+      "cacheWriteTokens": 0,
+      "reasoningTokens": null
+    }
+  }
+}

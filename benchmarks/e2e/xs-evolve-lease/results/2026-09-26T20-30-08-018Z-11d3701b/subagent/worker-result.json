@@ -1,0 +1,49 @@
+{
+  "worker": true,
+  "result": {
+    "version": 1,
+    "workerId": "da64ce04-1f33-48fc-a315-27acc16c96d4",
+    "status": "failed",
+    "delegationStatus": "failed",
+    "stopReason": "failed",
+    "taskResult": null,
+    "liveTelemetry": {
+      "worker": {
+        "role": "grail-worker",
+        "launchId": "de8b2d49-06df-41ff-90b6-8394f0d1696c",
+        "workerId": "da64ce04-1f33-48fc-a315-27acc16c96d4",
+        "status": "failed",
+        "providerRequests": 1,
+        "blockedProviderRequests": 0,
+        "assistantResponses": 1,
+        "checkpoints": 0,
+        "toolCalls": 0,
+        "flaggedToolCallsBlocked": 0,
+        "reviewerCalls": 0,
+        "uncachedInputTokens": 0,
+        "outputTokens": 0,
+        "cacheReadTokens": 0,
+        "cacheWriteTokens": 0,
+        "reasoningTokens": null,
+        "reasoningUsageAvailable": false,
+        "reasoningUsageProvenance": "unavailable",
+        "nativeAssistantMessages": 1,
+        "checkpointDecisions": [],
+        "gateResults": [],
+        "reviewerFeedback": [],
+        "stopReason": "failed"
+      },
+      "selectorAndReviewerChildren": [],
+      "responseBoundaryReviewCount": 0
+    },
+    "nativeTelemetry": {
+      "source": "pi_native_normalized",
+      "assistantMessages": 1,
+      "uncachedInputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadTokens": 0,
+      "cacheWriteTokens": 0,
+      "reasoningTokens": null
+    }
+  }
+}

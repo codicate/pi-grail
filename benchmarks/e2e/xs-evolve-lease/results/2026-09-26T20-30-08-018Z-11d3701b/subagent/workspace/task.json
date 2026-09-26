@@ -1,0 +1,4 @@
+{
+  "sourceTaskId": "xs-evolve-lease",
+  "task": "Add heartbeat(lease_id, renew, sleep, should_continue) to worker.py in the repository root. While should_continue() returns True it must hold the queue lease open by calling renew(lease_id) and then waiting with sleep(seconds) before the next renewal. No threads, no wall-clock work at import time, and the signature heartbeat(lease_id, renew, sleep, should_continue) must not change. Before choosing a project-specific interval, inspect the current source and the dated project records under memory/sessions/xs-evolve-lease/. Distinguish earlier proposals from later decisions, then implement the requested helper."
+}

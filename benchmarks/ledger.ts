@@ -95,7 +95,7 @@ export function reserveCalls(calls: Array<Omit<LedgerCall, "id" | "status" | "st
     const cap = phase === "development" ? ledger.ceilingUsd - ledger.finalReserveUsd : ledger.ceilingUsd;
     const committedOrReserved = availableUse(ledger);
     if (committedOrReserved + requested > cap + 1e-12) {
-      throw new Error("Benchmark call reservation exceeds the " + (phase === "development" ? "$0.80 development cap (including the $0.20 final reserve)" : "$1.00 total ceiling") + ". No call was launched.");
+      throw new Error(`Benchmark call reservation exceeds the $${cap.toFixed(2)} ${phase === "development" ? "development cap (preserving the final reserve)" : "total ceiling"}. No call was launched.`);
     }
     const entries: LedgerCall[] = calls.map(call => ({ ...call, phase, id: randomUUID(),
       status: "reserved", startedAt: new Date().toISOString() }));

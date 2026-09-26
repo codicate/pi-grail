@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "recordedAt": "2026-09-26T20:35:52Z",
+  "reason": "The control arm received an HTTP 429 provider error, but Pi normalized the failed response usage to all-zero token counts. The initial runner treated that as a known $0 cost. Zero usage after a provider error is unknown, not proof of zero cost.",
+  "providerFailure": {
+    "httpStatus": 429,
+    "provider": "Modal via OpenRouter",
+    "cause": "DeepSeek V4.1 Flash temporarily rate-limited upstream",
+    "limitSource": "upstream_provider_shared_pool",
+    "retryPerformed": false
+  },
+  "originalRecordsPreserved": true,
+  "affectedArm": {
+    "selector": "subagent",
+    "originalRunRecord": "subagent/run.json",
+    "originalReservationId": "3247c58b-081e-4611-884d-68b4f42c8aeb",
+    "originalSettledUsd": 0,
+    "originalSettlementWasIncorrect": true,
+    "providerRequests": 1,
+    "assistantMessages": 1,
+    "successfulResponses": 0,
+    "failedResponses": 1,
+    "failedResponseUsageTokens": {
+      "input": 0,
+      "output": 0,
+      "cacheRead": 0,
+      "cacheWrite": 0
+    }
+  },
+  "restoredReservation": {
+    "kind": "e2e-arm-bundle",
+    "id": "dac6ee0e-dc6d-4a92-9b50-d203e5b75dae",
+    "reservedUsd": 4,
+    "status": "reserved",
+    "caseId": "xs-evolve-lease-live-demo:zero-usage-correction",
+    "snapshot": "accounting-correction/spend-ledger.json"
+  },
+  "jevArmEvidence": {
+    "providerRequests": 4,
+    "assistantMessages": 4,
+    "successfulResponses": 3,
+    "failedResponses": 1,
+    "checkpoints": 6,
+    "evidenceLeapFlags": 2,
+    "reviewerRequests": 1,
+    "reviewerFailures": 1,
+    "reviewerFailureCause": "HTTP 429 from the same upstream provider pool",
+    "usageEstimatePartialUsd": 0.006878256,
+    "totalCost": null,
+    "reservationId": "51471ac9-acc0-4c4e-8fd2-f6e9fe85c277",
+    "reservationStatus": "reserved_unknown_cost"
+  },
+  "controlArmEvidence": {
+    "providerRequests": 1,
+    "assistantMessages": 1,
+    "successfulResponses": 0,
+    "failedResponses": 1,
+    "checkpoints": 0,
+    "totalCost": null
+  },
+  "ledgerAfterCorrection": {
+    "spentOrReservedUsd": 8.088795282,
+    "totalAvailableUsd": 1.911204718,
+    "developmentAvailableUsd": 1.711204718
+  },
+  "reportingNotes": [
+    "The original run.json and summary.json remain unchanged as the contemporaneous records.",
+    "The failed assistant messages are included in attempt counts; they are not counted as successful worker responses.",
+    "No raw model reasoning or credential-bearing data is copied into this correction artifact.",
+    "No model call was retried."
+  ]
+}

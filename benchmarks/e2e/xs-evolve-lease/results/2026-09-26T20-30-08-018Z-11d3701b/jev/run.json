@@ -1,0 +1,416 @@
+{
+  "arm": "jev",
+  "model": "openrouter/deepseek/deepseek-v4.1-flash",
+  "thinking": "low",
+  "selector": "jev",
+  "routePolicyVersion": "bounded-routing-low-v4-throughput",
+  "routePolicy": {
+    "allow_fallbacks": false,
+    "require_parameters": true,
+    "sort": "throughput",
+    "max_price": {
+      "prompt": 0.3,
+      "completion": 1.2
+    }
+  },
+  "timeoutMs": 300000,
+  "processWallMs": 24720.176874999997,
+  "armWallMs": 24975.015333,
+  "exitCode": 0,
+  "timedOut": false,
+  "error": null,
+  "sameStartingFiles": true,
+  "initialProjectHashes": {
+    ".pi/settings.json": "695fa8794b742137673ecc8b59165dc21f44eb8bad0c6a002823a2ef6cff355f",
+    "lease.py": "533dc0fc167b8d376456c6914653dbcd978d27337de47f0b155d01052107b9c4",
+    "memory/sessions/xs-evolve-lease/p01.jsonl": "83d0a8b637a335348512985b7f30e74d3260d6fa882b260ad07b41365adcb3e9",
+    "memory/sessions/xs-evolve-lease/p02.jsonl": "94fe7d1829c282893de131fb79cfb2a4bb86f3f3f7a0b350997dda9e6cfd5009",
+    "memory/sessions/xs-evolve-lease/p03.jsonl": "57be03230608a2fb09aba30c63bfaca46e5180662054135e99ac6d2b1b76d48e",
+    "README.md": "c9578566ac78abd60be1e0a2a29715b5d2073d847d0e1a0ee1061dc8ab1bfdee",
+    "task.json": "de5898b9b5740f7e49cb14e50b27c59650eb9aae5665b2ccedbfc4154e97fede",
+    "worker.py": "a3b131c98a439ea2a365ff71959948d653be9eb818750e723ed91c34c9e3aa2c"
+  },
+  "sourceProjectHashes": {
+    ".pi/settings.json": "695fa8794b742137673ecc8b59165dc21f44eb8bad0c6a002823a2ef6cff355f",
+    "lease.py": "533dc0fc167b8d376456c6914653dbcd978d27337de47f0b155d01052107b9c4",
+    "memory/sessions/xs-evolve-lease/p01.jsonl": "83d0a8b637a335348512985b7f30e74d3260d6fa882b260ad07b41365adcb3e9",
+    "memory/sessions/xs-evolve-lease/p02.jsonl": "94fe7d1829c282893de131fb79cfb2a4bb86f3f3f7a0b350997dda9e6cfd5009",
+    "memory/sessions/xs-evolve-lease/p03.jsonl": "57be03230608a2fb09aba30c63bfaca46e5180662054135e99ac6d2b1b76d48e",
+    "README.md": "c9578566ac78abd60be1e0a2a29715b5d2073d847d0e1a0ee1061dc8ab1bfdee",
+    "task.json": "de5898b9b5740f7e49cb14e50b27c59650eb9aae5665b2ccedbfc4154e97fede",
+    "worker.py": "a3b131c98a439ea2a365ff71959948d653be9eb818750e723ed91c34c9e3aa2c"
+  },
+  "changedFiles": [],
+  "memoryChangedFiles": [],
+  "checker": {
+    "ok": false,
+    "verdict": "NO_HEARTBEAT",
+    "reason": "worker.py does not define heartbeat()",
+    "wallMs": 194.7170839999999,
+    "stdout": "VERDICT NO_HEARTBEAT\n",
+    "stderr": ""
+  },
+  "finalPatchPath": "worker.patch",
+  "telemetry": {
+    "workerStatus": "failed",
+    "delegationStatus": "failed",
+    "stopReason": "failed",
+    "taskResult": null,
+    "calls": {
+      "workerProviderRequests": 4,
+      "workerResponses": 4,
+      "workerToolCalls": 5,
+      "workerFlaggedToolCallsBlocked": 1,
+      "checkpoints": 6,
+      "responseBoundaryReviews": 1,
+      "observedProviderRequestsTotal": 11,
+      "childLaunches": [
+        {
+          "role": "grail-reviewer",
+          "status": "failed",
+          "providerRequests": 1,
+          "blockedProviderRequests": 0,
+          "assistantResponses": 1,
+          "toolCalls": 0,
+          "checkpoints": 0,
+          "reviewerCalls": 0
+        }
+      ]
+    },
+    "checkpointVisibility": {
+      "checkpoints": [
+        {
+          "index": 1,
+          "selector": "jev",
+          "status": "NO_VISIBLE_SIGNAL",
+          "perSignal": {
+            "instruction_drift": "NO_VISIBLE_SIGNAL",
+            "unverified_assumption": "NO_VISIBLE_SIGNAL",
+            "evidence_leap": "NO_VISIBLE_SIGNAL"
+          },
+          "rawReferences": [
+            "cee1a915-144f-4ca0-90f3-41a51c050270:handoff",
+            "cee1a915-144f-4ca0-90f3-41a51c050270:response-1:thinking-0"
+          ],
+          "selectorInvocations": 1,
+          "latencyMs": 242.27187499999854,
+          "selectorUsage": {
+            "input_tokens": 1379,
+            "output_tokens": 144
+          },
+          "selectorNativeTelemetry": null
+        },
+        {
+          "index": 2,
+          "selector": "jev",
+          "status": "NO_VISIBLE_SIGNAL",
+          "perSignal": {
+            "instruction_drift": "NO_VISIBLE_SIGNAL",
+            "unverified_assumption": "NO_VISIBLE_SIGNAL",
+            "evidence_leap": "NO_VISIBLE_SIGNAL"
+          },
+          "rawReferences": [
+            "cee1a915-144f-4ca0-90f3-41a51c050270:handoff",
+            "cee1a915-144f-4ca0-90f3-41a51c050270:response-1:final"
+          ],
+          "selectorInvocations": 1,
+          "latencyMs": 141.9342919999999,
+          "selectorUsage": {
+            "input_tokens": 1434,
+            "output_tokens": 144
+          },
+          "selectorNativeTelemetry": null
+        },
+        {
+          "index": 3,
+          "selector": "jev",
+          "status": "NO_VISIBLE_SIGNAL",
+          "perSignal": {
+            "instruction_drift": "NO_VISIBLE_SIGNAL",
+            "unverified_assumption": "NO_VISIBLE_SIGNAL",
+            "evidence_leap": "NO_VISIBLE_SIGNAL"
+          },
+          "rawReferences": [
+            "cee1a915-144f-4ca0-90f3-41a51c050270:handoff",
+            "cee1a915-144f-4ca0-90f3-41a51c050270:response-2:thinking-0"
+          ],
+          "selectorInvocations": 1,
+          "latencyMs": 149.59141600000112,
+          "selectorUsage": {
+            "input_tokens": 1385,
+            "output_tokens": 144
+          },
+          "selectorNativeTelemetry": null
+        },
+        {
+          "index": 4,
+          "selector": "jev",
+          "status": "NO_VISIBLE_SIGNAL",
+          "perSignal": {
+            "instruction_drift": "NO_VISIBLE_SIGNAL",
+            "unverified_assumption": "NO_VISIBLE_SIGNAL",
+            "evidence_leap": "NO_VISIBLE_SIGNAL"
+          },
+          "rawReferences": [
+            "cee1a915-144f-4ca0-90f3-41a51c050270:handoff",
+            "cee1a915-144f-4ca0-90f3-41a51c050270:response-2:final"
+          ],
+          "selectorInvocations": 1,
+          "latencyMs": 166.6272080000017,
+          "selectorUsage": {
+            "input_tokens": 1489,
+            "output_tokens": 144
+          },
+          "selectorNativeTelemetry": null
+        },
+        {
+          "index": 5,
+          "selector": "jev",
+          "status": "FLAG",
+          "perSignal": {
+            "instruction_drift": "NO_VISIBLE_SIGNAL",
+            "unverified_assumption": "NO_VISIBLE_SIGNAL",
+            "evidence_leap": "FLAG"
+          },
+          "rawReferences": [
+            "cee1a915-144f-4ca0-90f3-41a51c050270:handoff",
+            "cee1a915-144f-4ca0-90f3-41a51c050270:response-3:thinking-0"
+          ],
+          "selectorInvocations": 1,
+          "latencyMs": 186.533875000001,
+          "selectorUsage": {
+            "input_tokens": 1972,
+            "output_tokens": 142
+          },
+          "selectorNativeTelemetry": null
+        },
+        {
+          "index": 6,
+          "selector": "jev",
+          "status": "FLAG",
+          "perSignal": {
+            "instruction_drift": "NO_VISIBLE_SIGNAL",
+            "unverified_assumption": "NO_VISIBLE_SIGNAL",
+            "evidence_leap": "FLAG"
+          },
+          "rawReferences": [
+            "cee1a915-144f-4ca0-90f3-41a51c050270:handoff",
+            "cee1a915-144f-4ca0-90f3-41a51c050270:response-3:final"
+          ],
+          "selectorInvocations": 1,
+          "latencyMs": 165.755165999999,
+          "selectorUsage": {
+            "input_tokens": 2009,
+            "output_tokens": 142
+          },
+          "selectorNativeTelemetry": null
+        }
+      ],
+      "selectorAndReviewerChildren": [
+        {
+          "role": "grail-reviewer",
+          "refs": []
+        }
+      ],
+      "archivalMemoryIsInjectedAsAuthorizedUpdate": false,
+      "note": "Gate rawReferences are reported verbatim; retrieved memory files are not automatically added to the classifier packet."
+    },
+    "reviewerFeedback": [
+      {
+        "status": "failed",
+        "text": "The reviewer failed; the flagged concern remains unresolved.",
+        "rawReferences": [
+          "cee1a915-144f-4ca0-90f3-41a51c050270:response-3:thinking-0",
+          "cee1a915-144f-4ca0-90f3-41a51c050270:response-3:final"
+        ]
+      }
+    ],
+    "usage": {
+      "native": [
+        {
+          "role": "worker",
+          "attemptedCalls": 4,
+          "responseCount": 4,
+          "telemetry": {
+            "source": "pi_native_normalized",
+            "assistantMessages": 4,
+            "uncachedInputTokens": 15670,
+            "outputTokens": 900,
+            "cacheReadTokens": 2304,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": null
+          },
+          "cost": {
+            "estimatedUsd": 0.0064722,
+            "provenance": "conservative_shared_route_price_ceiling; not_billed_cost"
+          }
+        },
+        {
+          "role": "grail-reviewer",
+          "launchId": "427fe73a-90b9-4255-adf8-9b5654bb12c6",
+          "attemptedCalls": 1,
+          "responseCount": 1,
+          "telemetry": {
+            "source": "unavailable",
+            "assistantMessages": 1,
+            "uncachedInputTokens": 0,
+            "outputTokens": 0,
+            "cacheReadTokens": 0,
+            "cacheWriteTokens": 0,
+            "reasoningTokens": null
+          },
+          "cost": {
+            "estimatedUsd": null,
+            "provenance": "unknown_native_usage_or_missing_price"
+          }
+        }
+      ],
+      "deepseekEstimateUsd": null,
+      "jevGateCalls": [
+        {
+          "checkpoint": 1,
+          "invocationCount": 1,
+          "usage": {
+            "input_tokens": 1379,
+            "output_tokens": 144
+          },
+          "normalizedUsage": {
+            "inputTokens": 1379,
+            "outputTokens": 144,
+            "cachedInputTokens": null,
+            "cacheWriteTokens": null,
+            "reasoningTokens": null,
+            "reasoningTokensWarning": null,
+            "totalTokens": 1523,
+            "reasoningIsOutputSubset": true
+          },
+          "estimatedUsd": 0.000057918000000000003,
+          "provenance": "estimated-from-2026-09-26-listed-rates; cached-read count unavailable, full input charged at standard input rate"
+        },
+        {
+          "checkpoint": 2,
+          "invocationCount": 1,
+          "usage": {
+            "input_tokens": 1434,
+            "output_tokens": 144
+          },
+          "normalizedUsage": {
+            "inputTokens": 1434,
+            "outputTokens": 144,
+            "cachedInputTokens": null,
+            "cacheWriteTokens": null,
+            "reasoningTokens": null,
+            "reasoningTokensWarning": null,
+            "totalTokens": 1578,
+            "reasoningIsOutputSubset": true
+          },
+          "estimatedUsd": 0.000060228,
+          "provenance": "estimated-from-2026-09-26-listed-rates; cached-read count unavailable, full input charged at standard input rate"
+        },
+        {
+          "checkpoint": 3,
+          "invocationCount": 1,
+          "usage": {
+            "input_tokens": 1385,
+            "output_tokens": 144
+          },
+          "normalizedUsage": {
+            "inputTokens": 1385,
+            "outputTokens": 144,
+            "cachedInputTokens": null,
+            "cacheWriteTokens": null,
+            "reasoningTokens": null,
+            "reasoningTokensWarning": null,
+            "totalTokens": 1529,
+            "reasoningIsOutputSubset": true
+          },
+          "estimatedUsd": 0.00005817,
+          "provenance": "estimated-from-2026-09-26-listed-rates; cached-read count unavailable, full input charged at standard input rate"
+        },
+        {
+          "checkpoint": 4,
+          "invocationCount": 1,
+          "usage": {
+            "input_tokens": 1489,
+            "output_tokens": 144
+          },
+          "normalizedUsage": {
+            "inputTokens": 1489,
+            "outputTokens": 144,
+            "cachedInputTokens": null,
+            "cacheWriteTokens": null,
+            "reasoningTokens": null,
+            "reasoningTokensWarning": null,
+            "totalTokens": 1633,
+            "reasoningIsOutputSubset": true
+          },
+          "estimatedUsd": 0.000062538,
+          "provenance": "estimated-from-2026-09-26-listed-rates; cached-read count unavailable, full input charged at standard input rate"
+        },
+        {
+          "checkpoint": 5,
+          "invocationCount": 1,
+          "usage": {
+            "input_tokens": 1972,
+            "output_tokens": 142
+          },
+          "normalizedUsage": {
+            "inputTokens": 1972,
+            "outputTokens": 142,
+            "cachedInputTokens": null,
+            "cacheWriteTokens": null,
+            "reasoningTokens": null,
+            "reasoningTokensWarning": null,
+            "totalTokens": 2114,
+            "reasoningIsOutputSubset": true
+          },
+          "estimatedUsd": 0.00008282399999999999,
+          "provenance": "estimated-from-2026-09-26-listed-rates; cached-read count unavailable, full input charged at standard input rate"
+        },
+        {
+          "checkpoint": 6,
+          "invocationCount": 1,
+          "usage": {
+            "input_tokens": 2009,
+            "output_tokens": 142
+          },
+          "normalizedUsage": {
+            "inputTokens": 2009,
+            "outputTokens": 142,
+            "cachedInputTokens": null,
+            "cacheWriteTokens": null,
+            "reasoningTokens": null,
+            "reasoningTokensWarning": null,
+            "totalTokens": 2151,
+            "reasoningIsOutputSubset": true
+          },
+          "estimatedUsd": 0.000084378,
+          "provenance": "estimated-from-2026-09-26-listed-rates; cached-read count unavailable, full input charged at standard input rate"
+        }
+      ],
+      "jevEstimateUsd": 0.000406056,
+      "totalEstimatedUsd": null,
+      "unknownCostCallCount": 1,
+      "unknownCostCalls": {
+        "nativePiChildren": 1,
+        "jevGateInvocations": 0
+      },
+      "actualBilledUsd": null,
+      "source": "Pi-native tokens × shared conservative route ceiling plus Jev provider usage × listed Jev rate; estimates only",
+      "externalJevUsageRetainedInCheckpoint": true,
+      "reasoningIsAlreadyIncludedInOutputTokens": true,
+      "nativeUsageUnavailable": false
+    }
+  },
+  "reservation": {
+    "kind": "e2e-arm-bundle",
+    "id": "51471ac9-acc0-4c4e-8fd2-f6e9fe85c277",
+    "reservedUsd": 4,
+    "status": "reserved_unknown_cost",
+    "settledUsd": null,
+    "committedUsd": 4,
+    "costProvenance": "unknown_cost_reservation_retained"
+  },
+  "jsonEventCount": 3,
+  "savedRawEventsPath": "pi-events.jsonl"
+}
