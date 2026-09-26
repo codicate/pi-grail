@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "upstream": {
+    "repository": "https://github.com/GiulioDER/agent-memory-bench",
+    "commit": "ee23ad22026ab63213c2282949cd5b9b6097664b",
+    "license": "Apache-2.0"
+  },
+  "files": {
+    "fixture/project/.pi/settings.json": "695fa8794b742137673ecc8b59165dc21f44eb8bad0c6a002823a2ef6cff355f",
+    "fixture/project/README.md": "c9578566ac78abd60be1e0a2a29715b5d2073d847d0e1a0ee1061dc8ab1bfdee",
+    "fixture/project/lease.py": "533dc0fc167b8d376456c6914653dbcd978d27337de47f0b155d01052107b9c4",
+    "fixture/project/worker.py": "a3b131c98a439ea2a365ff71959948d653be9eb818750e723ed91c34c9e3aa2c",
+    "fixture/project/task.json": "de5898b9b5740f7e49cb14e50b27c59650eb9aae5665b2ccedbfc4154e97fede",
+    "fixture/project/memory/sessions/xs-evolve-lease/p01.jsonl": "83d0a8b637a335348512985b7f30e74d3260d6fa882b260ad07b41365adcb3e9",
+    "fixture/project/memory/sessions/xs-evolve-lease/p02.jsonl": "94fe7d1829c282893de131fb79cfb2a4bb86f3f3f7a0b350997dda9e6cfd5009",
+    "fixture/project/memory/sessions/xs-evolve-lease/p03.jsonl": "57be03230608a2fb09aba30c63bfaca46e5180662054135e99ac6d2b1b76d48e",
+    "fixture/source-task.json": "032439cdcbcb09f64d892d1c1823b5e7202b876058f3e1d92836bb5b53be773e",
+    "oracle/upstream-driver.py": "a7b2339bf250154ad1353e004c055ac5f4438f97368d0d0169ae3dabc554c236",
+    "oracle/upstream-checker.py": "6948b1413b2bd0cdf01768f68f81bf2990829cbfd1f2affba04b8fef7f243f4a",
+    "UPSTREAM-LICENSE.txt": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+  }
+}

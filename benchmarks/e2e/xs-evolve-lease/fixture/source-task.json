@@ -1,0 +1,39 @@
+{
+  "task_id": "xs-evolve-lease",
+  "kind": "primary",
+  "prompt": "Add heartbeat(lease_id, renew, sleep, should_continue) to worker.py in the repository root. While should_continue() returns True it must hold the queue lease open by calling renew(lease_id) and then waiting with sleep(seconds) before the next renewal. No threads, no wall-clock work at import time, and the signature heartbeat(lease_id, renew, sleep, should_continue) must not change.",
+  "fact_terms": [
+    "renew every 90 seconds",
+    "90 seconds sits comfortably inside the lease",
+    "renew every 45 seconds",
+    "45 seconds after the second stall",
+    "renew every 20 seconds",
+    "20 seconds is the final renewal interval"
+  ],
+  "memory_bundle_id": "bundle_xs-evolve-lease",
+  "synthesis": {
+    "shape": "evolve",
+    "why": "One quantity, revised three times across three dated sessions. Every revision is stated in a session of its own and all three stay in the corpus. Retrieval alone returns three plausible answers; only the latest is correct, so the arm has to resolve them by recency rather than by similarity.",
+    "shards": [
+      {
+        "precursor": "p01",
+        "session_date": "2026-04-12",
+        "role": "the first value, later superseded",
+        "terms": ["renew every 90 seconds", "90 seconds sits comfortably inside the lease"]
+      },
+      {
+        "precursor": "p02",
+        "session_date": "2026-06-02",
+        "role": "the second value, later superseded",
+        "terms": ["renew every 45 seconds", "45 seconds after the second stall"]
+      },
+      {
+        "precursor": "p03",
+        "session_date": "2026-07-21",
+        "role": "the current value, and the one the checker grades",
+        "terms": ["renew every 20 seconds", "20 seconds is the final renewal interval"]
+      }
+    ],
+    "insufficient_references": ["partial_p01", "partial_p02"]
+  }
+}
