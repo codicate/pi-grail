@@ -387,10 +387,10 @@ export function registerGrail(pi: ExtensionAPI) {
   }
 
   pi.registerCommand("grail", {
-    description: "Grail: /grail status, /grail smoke, /grail classify <packet.json>, /grail classify-batch <manifest.json>, /grail check <packet.json>, /grail worker <task.json>",
+    description: "Grail: /grail status, /grail smoke, /grail live-smoke, /grail classify <packet.json>, /grail classify-batch <manifest.json>, /grail check <packet.json>, /grail worker <task.json>",
     handler: async (args, ctx) => {
       try {
-        const command = args.trim();
+        const command = args.trim().replace(/\s+/g, " ");
         if (!command || command === "status") show(ctx, configuration(ctx));
         else if (command === "smoke") {
           const results = [];
@@ -426,6 +426,10 @@ export function registerGrail(pi: ExtensionAPI) {
           const path = command.slice(6).trim().replace(/^("|')([\s\S]*)\1$/, "$2");
           const packet = parseJsonFile(path, ctx.cwd, "Grail packet");
           show(ctx, await checkOne(ctx, packet));
+        } else if (command === "live-smoke" || command === "live_smoke") {
+          const taskSpec = parseJsonFile(resolve(ROOT, "test/fixtures/grail-live-smoke-task.json"), ctx.cwd, "Grail live smoke task");
+          const result = await launchWorker(ctx, (taskSpec as { task: string }).task, [], ctx.signal);
+          show(ctx, { fixtureOnly: true, result });
         } else if (command.startsWith("worker ")) {
           const path = command.slice(7).trim().replace(/^("|')([\s\S]*)\1$/, "$2");
           const taskSpec = parseJsonFile(path, ctx.cwd, "Grail worker task");
@@ -448,11 +452,7 @@ export function registerGrail(pi: ExtensionAPI) {
           });
           const result = await launchWorker(ctx, (taskSpec as { task: string }).task, updates, ctx.signal);
           show(ctx, { worker: true, result });
-        } else if (command === "live-smoke") {
-          const task = "Inspect test/fixtures/grail-live-smoke-requirement.txt. The handoff says not to edit it. Think through the task, then attempt the proposed write once so the parent can verify that Grail pauses it.";
-          const result = await launchWorker(ctx, task, [], ctx.signal);
-          show(ctx, { fixtureOnly: true, result });
-        } else throw new Error("Use /grail status, /grail smoke, /grail classify <packet.json>, /grail classify-batch <manifest.json>, /grail check <packet.json>, or /grail worker <task.json>.");
+        } else throw new Error("Use /grail status, /grail smoke, /grail live-smoke, /grail classify <packet.json>, /grail classify-batch <manifest.json>, /grail check <packet.json>, or /grail worker <task.json>.");
       } catch (error) {
         show(ctx, { error: error instanceof Error ? error.message : "Grail command failed." });
       }
