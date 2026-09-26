@@ -59,6 +59,7 @@ export type NormalizedUsage = {
   cachedInputTokens: number | null;
   cacheWriteTokens: number | null;
   reasoningTokens: number | null;
+  reasoningTokensWarning: string | null;
   totalTokens: number | null;
   reasoningIsOutputSubset: true;
 };
@@ -73,13 +74,19 @@ export function normalizeUsage(value: unknown): NormalizedUsage | null {
   const outputTokens = finiteNumber(usage.output, usage.outputTokens, usage.completion_tokens, usage.completionTokens, usage.output_tokens);
   const cachedInputTokens = finiteNumber(usage.cacheRead, usage.cachedInputTokens, promptDetails?.cached_tokens, usage.cached_tokens);
   const cacheWriteTokens = finiteNumber(usage.cacheWrite, usage.cacheWriteTokens, promptDetails?.cache_write_tokens);
-  const reasoningTokens = finiteNumber(usage.reasoning, usage.reasoningTokens, completionDetails?.reasoning_tokens, usage.reasoning_tokens);
+  const reportedReasoningTokens = finiteNumber(usage.reasoning, usage.reasoningTokens,
+    completionDetails?.reasoning_tokens, usage.reasoning_tokens);
+  const reasoningTokensWarning = reportedReasoningTokens !== null && outputTokens !== null
+    && reportedReasoningTokens > outputTokens
+    ? "Reported reasoning tokens exceeded output tokens; normalized value set to null." : null;
+  const reasoningTokens = reasoningTokensWarning ? null : reportedReasoningTokens;
   // OpenRouter prompt_tokens already includes cached tokens. Pi's native input
   // omits cacheRead/cacheWrite, so add both exactly once for canonical input.
   const inputTokens = providerInput ?? (piInput === null ? null : piInput + (cachedInputTokens ?? 0) + (cacheWriteTokens ?? 0));
   const totalTokens = inputTokens !== null && outputTokens !== null
     ? inputTokens + outputTokens : finiteNumber(usage.totalTokens, usage.total_tokens);
-  return { inputTokens, outputTokens, cachedInputTokens, cacheWriteTokens, reasoningTokens, totalTokens, reasoningIsOutputSubset: true };
+  return { inputTokens, outputTokens, cachedInputTokens, cacheWriteTokens, reasoningTokens, reasoningTokensWarning,
+    totalTokens, reasoningIsOutputSubset: true };
 }
 
 export function computedCost(selector: Selector, usage: NormalizedUsage | null): { usd: number | null; provenance: string } {

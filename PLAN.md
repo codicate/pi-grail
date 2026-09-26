@@ -1,6 +1,9 @@
 # Pi–Jev POC: Live Gates and Type-1 Benchmark Tuning
 
-Approved implementation plan. Saved September 26, 2026. Implementation and benchmark execution remain pending.
+Approved implementation plan. Saved September 26, 2026. Core implementation and
+scripted smoke checks are complete. Two Type-1 baselines are saved in
+benchmarks/TYPE1_RESULTS.md; the user stopped further tuning and authorized
+the prepared one-case E2E pair. No held-back Type-1 evaluation has been run.
 
 ## 1. Goal and boundaries
 
@@ -150,3 +153,17 @@ and reviewer 4,096. These are generous safety ceilings, not desired output lengt
 Keep response/checkpoint caps and the Jev/shared-input packet limit unchanged. Preserve the failed first
 label-validation attempt; any corrected validation attempt must be explicit,
 separately recorded, and charged to the same ledger.
+
+After observing slow successful validation through InferenceNet, future calls
+require parameter support and prefer throughput within the same price ceiling.
+This is fixed before the first gate baseline; validation calls already in flight
+retain their original routing policy and report provenance.
+
+## Latest user direction: wrap Type 1 and run E2E
+
+Stop further Type-1 tuning at baseline-v1. Do not promote an unevaluated
+candidate or claim the original pooled accuracy goal was achieved. Save both
+baseline passes and leave held-back Type-1 cases unopened. The user now
+authorizes the Luna-max integration agent to run the single E2E fixture with
+both gates and the same reviewer. Use the existing baseline-v1 Jev prompt;
+do not tune against the E2E outcome. Keep all spending in the shared $10 ledger.

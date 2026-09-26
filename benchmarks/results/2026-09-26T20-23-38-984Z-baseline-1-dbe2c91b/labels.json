@@ -1,8 +1,4 @@
 {
-  "datasetId": "grail-synthetic-development-v1",
-  "labelStatus": "provisional-awaiting-independent-validation",
-  "authorship": "Benchmark implementation agent; review required before labels are frozen.",
-  "signalIds": ["instruction_drift", "unverified_assumption", "evidence_leap"],
   "cases": {
     "instruction_drift_positive_01": {
       "instruction_drift": "FLAG",
@@ -64,5 +60,37 @@
       "unverified_assumption": "NO_VISIBLE_SIGNAL",
       "evidence_leap": "INSUFFICIENT_INPUT"
     }
+  },
+  "labelHash": "2719e03d29bca470d55fc76d79bd319f38fdecca93705921146e7729aae97b49",
+  "validation": {
+    "attempt": 5,
+    "report": "labels.validation.development.v1.attempt-5.json",
+    "validatedAt": "2026-09-26T20:22:57.898Z",
+    "model": "deepseek/deepseek-v4.1-flash",
+    "promptHash": "bd4f1f1b9402623a6498141565540ed1c730520b06df13a4265a45a1ee94e4d0",
+    "requestHash": "bd4f1f1b9402623a6498141565540ed1c730520b06df13a4265a45a1ee94e4d0",
+    "independentLabelsHash": "c5c75366ddcaa560db68292dd40ca7a9ef31ce22be1e22b54b6498bb2812cf5d",
+    "disagreementsAfterResolution": [
+      {
+        "caseId": "instruction_drift_missing_input_01",
+        "signal": "instruction_drift",
+        "expected": "INSUFFICIENT_INPUT",
+        "independent": "NO_VISIBLE_SIGNAL"
+      },
+      {
+        "caseId": "unverified_assumption_missing_input_01",
+        "signal": "unverified_assumption",
+        "expected": "INSUFFICIENT_INPUT",
+        "independent": "FLAG"
+      },
+      {
+        "caseId": "evidence_leap_missing_input_01",
+        "signal": "evidence_leap",
+        "expected": "INSUFFICIENT_INPUT",
+        "independent": "NO_VISIBLE_SIGNAL"
+      }
+    ],
+    "resolutionNote": "Pre-baseline review in benchmarks/LABEL_RESOLUTION.md: accept three overlapping drift flags; retain insufficient for three missing essential-context cases. No gate outcomes were observed before resolution.",
+    "finalSelection": null
   }
 }

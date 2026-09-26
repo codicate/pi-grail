@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "iterationId": "2026-09-26T20-25-01-857Z-baseline-2-01e902a4",
+  "kind": "baseline",
+  "datasetKind": "development",
+  "datasetId": "grail-synthetic-development-v1",
+  "createdAt": "2026-09-26T20:25:02.091Z",
+  "caseCount": 12,
+  "promptVersion": "baseline-v1",
+  "promptHash": "b871930ac31911c6a3cbb4d7c5928b4d80b1f6ec03932738584b34d807603898",
+  "controlPromptHash": "e5f08d2cb3d4c831c6155b3e06626c5c8711fdffb799d0973318f90cf0404469",
+  "models": {
+    "jev": "jev-1.13.0",
+    "control": "openrouter/deepseek/deepseek-v4.1-flash"
+  },
+  "effort": {
+    "jev": "native-choice",
+    "control": "low"
+  },
+  "providerPolicy": {
+    "version": "bounded-routing-low-v4-throughput",
+    "openrouter": {
+      "allow_fallbacks": false,
+      "require_parameters": true,
+      "sort": "throughput",
+      "max_price": {
+        "prompt": 0.3,
+        "completion": 1.2
+      }
+    }
+  },
+  "maxPacketBytes": 16000,
+  "outputTokenCap": 8192,
+  "costPolicy": {
+    "billedCostsUnavailableForSelectorCalls": true,
+    "piSubagentsUsageCost": "local model-catalog estimate; ignored in costUsd and retained only in raw trace",
+    "selectorEstimateRatesUsdPerMillion": {
+      "input": 0.3,
+      "cacheRead": 0.3,
+      "output": 1.2
+    },
+    "JevEstimateRatesUsdPerMillion": {
+      "input": 0.042,
+      "cacheRead": 0.042,
+      "output": 0
+    }
+  },
+  "reviewerCalls": 0,
+  "reviewerTokens": 0,
+  "workerCalls": 0,
+  "workerTokens": 0,
+  "retries": 0,
+  "selectorOrder": "serial; Jev then control for each case, identical packet; timing runs are not parallel",
+  "controlCacheKey": "64be2a5a793ab74b7f40038bab3d91b4c39ecf9e31adb963b98a1ec599813faa",
+  "runtime": {
+    "node": "v22.21.0",
+    "productionPi": "0.87.1",
+    "piSubagentsInstalled": "0.71.0",
+    "piSubagentsDeclared": "0.71.0",
+    "typesafeSdkInstalled": "0.6.0",
+    "typesafeSdkDeclared": "0.6.0",
+    "runtimePolicyVersion": "bounded-routing-low-v4-throughput",
+    "providerPolicy": {
+      "allow_fallbacks": false,
+      "require_parameters": true,
+      "sort": "throughput",
+      "max_price": {
+        "prompt": 0.3,
+        "completion": 1.2
+      }
+    }
+  },
+  "prices": {
+    "snapshotDate": "2026-09-26",
+    "selector": "openrouter/deepseek/deepseek-v4.1-flash",
+    "selectorSource": "OpenRouter max-price route ceiling checked 2026-09-26; estimates only, actual route may be cheaper",
+    "selectorInputUsdPerMillion": 0.3,
+    "selectorCachedInputUsdPerMillion": 0.3,
+    "selectorOutputUsdPerMillion": 1.2,
+    "jevModel": "jev-1.13.0",
+    "jevSource": "TypeSafe models API checked 2026-09-26",
+    "jevInputUsdPerMillion": 0.042,
+    "jevCachedInputUsdPerMillion": 0.042,
+    "jevOutputUsdPerMillion": 0
+  },
+  "labelHash": "2719e03d29bca470d55fc76d79bd319f38fdecca93705921146e7729aae97b49",
+  "timing": "classifyGrail latencyMs excludes common parent startup; parent process wall is recorded separately",
+  "parentProcessWallMs": 65047.027375000005,
+  "parentElapsedMs": 64154,
+  "parentStartupMs": 725,
+  "parentStartupIncludedInWallMs": true,
+  "parentStartupIncludedInGateLatency": false,
+  "exitCode": 0,
+  "batchFailure": null,
+  "completedAt": "2026-09-26T20:26:07.151Z"
+}

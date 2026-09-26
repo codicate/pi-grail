@@ -1,0 +1,24 @@
+{
+  "key": "64be2a5a793ab74b7f40038bab3d91b4c39ecf9e31adb963b98a1ec599813faa",
+  "cacheFile": null,
+  "historicalControlReuse": false,
+  "sharedSourceHash": "d30bec44ada5fa96b12d3d5dca3990698d42214bd77c589f524641dd23ab1d8f",
+  "runtime": {
+    "node": "v22.21.0",
+    "productionPi": "0.87.1",
+    "piSubagentsInstalled": "0.71.0",
+    "piSubagentsDeclared": "0.71.0",
+    "typesafeSdkInstalled": "0.6.0",
+    "typesafeSdkDeclared": "0.6.0",
+    "runtimePolicyVersion": "bounded-routing-low-v4-throughput",
+    "providerPolicy": {
+      "allow_fallbacks": false,
+      "require_parameters": true,
+      "sort": "throughput",
+      "max_price": {
+        "prompt": 0.3,
+        "completion": 1.2
+      }
+    }
+  }
+}

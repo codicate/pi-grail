@@ -18,7 +18,7 @@ const SIGNALS = SIGNAL_IDS as readonly SignalId[];
 const VALID_OUTCOMES = OUTCOMES as readonly Outcome[];
 
 type Dataset = "development" | "heldback";
-type Attempt = 1 | 2 | 3 | 4;
+type Attempt = 1 | 2 | 3 | 4 | 5;
 type ValidationStatus = "agreement" | "disagreement" | "error";
 type Disagreement = { caseId: string; signal: SignalId; expected: Outcome; independent: Outcome };
 type ValidationReport = {
@@ -99,6 +99,23 @@ function normalizeLabels(value: unknown, caseIds: string[]): GoldLabels {
   }
   if (caseIds.some(id => !rows.has(id))) throw new Error("The independent response omitted a case.");
   return Object.fromEntries(caseIds.map(id => [id, rows.get(id)!])) as GoldLabels;
+}
+
+function normalizeStoredLabels(value: unknown, caseIds: string[]): GoldLabels {
+  if (!isRecord(value) || Object.keys(value).length !== caseIds.length
+    || caseIds.some(id => !Object.prototype.hasOwnProperty.call(value, id))) {
+    throw new Error("The saved independent result does not match the current case IDs.");
+  }
+  const rows: GoldLabels = {};
+  for (const id of caseIds) {
+    const row = value[id];
+    if (!isRecord(row) || Object.keys(row).length !== SIGNALS.length
+      || SIGNALS.some(signal => !VALID_OUTCOMES.includes(row[signal] as Outcome))) {
+      throw new Error("The saved independent result contains incomplete or invalid labels.");
+    }
+    rows[id] = Object.fromEntries(SIGNALS.map(signal => [signal, row[signal]])) as Record<SignalId, Outcome>;
+  }
+  return rows;
 }
 
 function validateDataset(casesValue: unknown, labelsValue: unknown) {
@@ -204,8 +221,17 @@ function attempt4PartLedgerId(datasetId: string, part: number) {
   return `${datasetId}:attempt-4-part-${String(part).padStart(2, "0")}`;
 }
 
+function attempt5PartLedgerId(datasetId: string, part: number) {
+  return `${datasetId}:attempt-5-part-${String(part).padStart(2, "0")}`;
+}
+
 function hasAttempt4Ledger(datasetId: string) {
   const prefix = `${datasetId}:attempt-4-part-`;
+  return snapshot(LEDGER_PATH).calls.some(call => call.kind === "fixture-label-validation" && call.caseId?.startsWith(prefix));
+}
+
+function hasAttempt5Ledger(datasetId: string) {
+  const prefix = `${datasetId}:attempt-5-part-`;
   return snapshot(LEDGER_PATH).calls.some(call => call.kind === "fixture-label-validation" && call.caseId?.startsWith(prefix));
 }
 
@@ -268,8 +294,7 @@ function requestConfig(maxOutputTokens = MAX_OUTPUT_TOKENS) {
 }
 
 async function validateLabelsChunked(dataset: Dataset, datasetId: string, cases: BenchmarkCase[], gold: GoldLabels,
-  apiKey: string, finalSelection: ValidationReport["finalSelection"]) {
-  const attempt: Attempt = 4;
+  apiKey: string, finalSelection: ValidationReport["finalSelection"], attempt: 4 | 5) {
   const chunkSize = 4;
   const partCount = Math.ceil(cases.length / chunkSize);
   const outputCap = 16_384;
@@ -279,7 +304,43 @@ async function validateLabelsChunked(dataset: Dataset, datasetId: string, cases:
   const requestHashes: string[] = [];
   let failed: { message: string; timedOut: boolean } | null = null;
 
-  for (let part = 0; part < partCount; part++) {
+  let firstPart = 0;
+  if (attempt === 5) {
+    const firstChunk = cases.slice(0, chunkSize);
+    const expected = Object.fromEntries(firstChunk.map(item => [item.id, gold[item.id]!])) as GoldLabels;
+    const previousPath = datasetPaths(dataset, 4).validation.replace(/\.json$/, ".part-01.json");
+    const previous = readJson(previousPath);
+    const historicRequest = {
+      ...buildLabelRequest(datasetId, firstChunk, outputCap),
+      provider: { allow_fallbacks: false, max_price: { prompt: 0.3, completion: 1.2 } },
+    };
+    const previousProvisional = isRecord(previous) && isRecord(previous.provisionalLabels)
+      ? previous.provisionalLabels : null;
+    if (!isRecord(previous) || previous.attempt !== 4 || previous.part !== 1
+      || previous.datasetId !== datasetId || previous.status === "error"
+      || previous.requestHash !== hash(historicRequest)
+      || !previousProvisional || previousProvisional.datasetId !== datasetId
+      || !isRecord(previousProvisional.cases) || hash(previousProvisional.cases) !== hash(expected)) {
+      throw new Error("Attempt 4 part 1 does not match the current first-chunk request and labels; it cannot be reused.");
+    }
+    const reusedLabels = normalizeStoredLabels(previous.independentLabels, firstChunk.map(item => item.id));
+    const partPath = datasetPaths(dataset, attempt).validation.replace(/\.json$/, ".part-01.json");
+    writeNewJson(partPath, { ...previous, attempt, reused: true, reusedFromAttempt: 4,
+      reusedFromReport: previousPath.split(/[\\/]/).at(-1), partCount,
+      disagreements: disagreements(expected, reusedLabels, firstChunk.map(item => item.id)) });
+    Object.assign(independent, reusedLabels);
+    requestHashes.push(String(previous.requestHash));
+    partSummaries.push({ part: 1, report: partPath.split(/[\\/]/).at(-1), status: previous.status,
+      requestHash: previous.requestHash, usage: previous.usage ?? null, rawUsage: previous.rawUsage ?? null,
+      reportedCostUsd: previous.reportedCostUsd ?? null, estimatedCostUsd: previous.estimatedCostUsd ?? null,
+      costUsd: previous.costUsd ?? null, costProvenance: "reused-from-attempt-4-part-1-no-new-call",
+      provider: previous.provider ?? null, responseModel: previous.responseModel ?? null,
+      generationId: previous.generationId ?? null, finishReason: previous.finishReason ?? null,
+      reused: true, reusedFromAttempt: 4 });
+    firstPart = 1;
+  }
+
+  for (let part = firstPart; part < partCount; part++) {
     const chunk = cases.slice(part * chunkSize, (part + 1) * chunkSize);
     const expected = Object.fromEntries(chunk.map(item => [item.id, gold[item.id]!])) as GoldLabels;
     const request = buildLabelRequest(datasetId, chunk, outputCap);
@@ -291,7 +352,8 @@ async function validateLabelsChunked(dataset: Dataset, datasetId: string, cases:
     const reservedUsd = ((requestBytes + 8_192) * DEEPSEEK_ESTIMATE_PRICING.inputUsdPerMillion
       + outputCap * DEEPSEEK_ESTIMATE_PRICING.outputUsdPerMillion) / 1_000_000;
     const [reservation] = reserveCalls([{
-      kind: "fixture-label-validation", selector: MODEL, caseId: attempt4PartLedgerId(datasetId, part + 1),
+      kind: "fixture-label-validation", selector: MODEL,
+      caseId: attempt === 4 ? attempt4PartLedgerId(datasetId, part + 1) : attempt5PartLedgerId(datasetId, part + 1),
       promptHash: requestHash, reservedUsd, phase,
     }], phase, LEDGER_PATH);
 
@@ -388,7 +450,7 @@ async function validateLabelsChunked(dataset: Dataset, datasetId: string, cases:
     }
 
     const partNumber = part + 1;
-    const partPath = datasetPaths(dataset, 4).validation.replace(/\.json$/, `.part-${String(partNumber).padStart(2, "0")}.json`);
+    const partPath = datasetPaths(dataset, attempt).validation.replace(/\.json$/, `.part-${String(partNumber).padStart(2, "0")}.json`);
     const partDisagreements = labels ? disagreements(expected, labels, chunk.map(item => item.id)) : [];
     const partReport = {
       version: 1, dataset, datasetId, attempt, part: partNumber, partCount, status: partError ? "error" : partDisagreements.length ? "disagreement" : "agreement",
@@ -428,7 +490,7 @@ async function validateLabelsChunked(dataset: Dataset, datasetId: string, cases:
   };
   writeNewJson(paths.validation, report);
   if (failed?.timedOut) {
-    process.stderr.write("Label validation timed out; attempt 4 is saved and will not be retried automatically.\n");
+    process.stderr.write(`Label validation timed out; attempt ${attempt} is saved and will not be retried automatically.\n`);
     process.exit(1);
   }
   return { validation: report, frozenPath: null };
@@ -450,15 +512,21 @@ async function validateLabels(dataset: Dataset, final: boolean, attempt: Attempt
     const previousAttempt = (attempt - 1) as Attempt;
     const previousPath = datasetPaths(dataset, previousAttempt).validation;
     const previousReport = existsSync(previousPath) ? readJson(previousPath) : null;
-    if (!isRecord(previousReport) || previousReport.status !== "error" || !existingAttempt(datasetId, previousAttempt)) {
+    const previousLedgerExists = previousAttempt === 4 ? hasAttempt4Ledger(datasetId) : existingAttempt(datasetId, previousAttempt);
+    if (!isRecord(previousReport) || previousReport.status !== "error" || !previousLedgerExists) {
       throw new Error(`Attempt ${attempt} is permitted only after an immutable failed attempt ${previousAttempt} report and ledger entry.`);
     }
   }
-  if (attempt === 4 ? hasAttempt4Ledger(datasetId) : existingAttempt(datasetId, attempt)) {
+  const attemptAlreadyRecorded = attempt === 4 ? hasAttempt4Ledger(datasetId)
+    : attempt === 5 ? hasAttempt5Ledger(datasetId) : existingAttempt(datasetId, attempt);
+  const partialAttemptReportsExist = attempt === 5
+    && Array.from({ length: cases.length === 0 ? 0 : Math.ceil(cases.length / 4) }, (_, index) => index + 1)
+      .some(part => existsSync(paths.validation.replace(/\.json$/, `.part-${String(part).padStart(2, "0")}.json`)));
+  if (attemptAlreadyRecorded || partialAttemptReportsExist) {
     throw new Error(`The spend ledger already records attempt ${attempt}; no retry will be launched.`);
   }
   const apiKey = readOpenRouterKey();
-  if (attempt === 4) return validateLabelsChunked(dataset, datasetId, cases, gold, apiKey, finalSelection);
+  if (attempt === 4 || attempt === 5) return validateLabelsChunked(dataset, datasetId, cases, gold, apiKey, finalSelection, attempt);
   const request = buildLabelRequest(datasetId, cases);
   const requestHash = hash(request);
   const promptHash = hash({ messages: request.messages, model: request.model, provider: request.provider,
@@ -617,7 +685,7 @@ function parseArgs(args: string[]) {
   for (let index = 2; index < args.length; index++) {
     const arg = args[index];
     if (arg === "--final" || arg === "--accept-reviewed-disagreements") continue;
-    if (arg === "--attempt" && attempt === undefined && ["1", "2", "3", "4"].includes(args[index + 1] ?? "")) {
+    if (arg === "--attempt" && attempt === undefined && ["1", "2", "3", "4", "5"].includes(args[index + 1] ?? "")) {
       attempt = Number(args[++index]) as Attempt;
       continue;
     }
@@ -628,13 +696,13 @@ function parseArgs(args: string[]) {
     throw new Error("Unknown or incomplete benchmark-labels option: " + arg);
   }
   if (!(dataset === "development" || dataset === "heldback") || !(command === "validate" || command === "freeze")) {
-    throw new Error("Use: benchmark-labels.ts validate development|heldback [--final] [--attempt 1|2|3|4], or freeze development|heldback --attempt 1|2|3|4 [--final] [--accept-reviewed-disagreements --note <reason>].");
+    throw new Error("Use: benchmark-labels.ts validate development|heldback [--final] [--attempt 1|2|3|4|5], or freeze development|heldback --attempt 1|2|3|4|5 [--final] [--accept-reviewed-disagreements --note <reason>].");
   }
   if (acceptReviewedDisagreements && !note?.trim()) throw new Error("Manual disagreement acceptance requires a nonempty --note.");
   if (note && !acceptReviewedDisagreements) throw new Error("Use --note with --accept-reviewed-disagreements.");
   if (final && dataset !== "heldback") throw new Error("The --final flag is only valid for held-back labels.");
   if ((acceptReviewedDisagreements || note) && command !== "freeze") throw new Error("Manual disagreement options are only valid with freeze.");
-  if (command === "freeze" && attempt === undefined) throw new Error("Choose the successful report explicitly with --attempt 1|2|3|4.");
+  if (command === "freeze" && attempt === undefined) throw new Error("Choose the successful report explicitly with --attempt 1|2|3|4|5.");
   return { command, dataset, final, attempt, acceptReviewedDisagreements, note } as const;
 }
 

@@ -833,5 +833,8 @@
       "costProvenance": "estimated-from-2026-09-26-max-route-ceiling",
       "settledAt": "2026-09-26T20:26:07.150Z"
     }
-  ]
+  ],
+  "spentOrReservedUsd": 0.088795282,
+  "developmentAvailableUsd": 9.711204718000001,
+  "totalAvailableUsd": 9.911204718
 }

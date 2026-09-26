@@ -82,8 +82,10 @@ in .pi/settings.json for bounded POC runs.
 Type 1 evaluates selection only, using 12 development cases and three held-back
 cases. Intended labels are independently validated once with DeepSeek-low and
 then frozen. No workers, reviewers, or per-iteration judges run in Type 1.
-The one-case E2E runner is being prepared separately; E2E execution is not part
-of this tuning phase and requires a later explicit run.
+The [Type-1 baseline results](benchmarks/TYPE1_RESULTS.md) are saved; further
+tuning and held-back evaluation were stopped at the user's request. The
+[one-case E2E runner](benchmarks/e2e/xs-evolve-lease/README.md) is implemented,
+and its first live pair has now been authorized separately.
 
 Timing includes actual production-Pi child startup and parsing for the control;
 common parent startup is recorded separately. Calls run serially, interleaving
@@ -101,6 +103,8 @@ separate accounting buckets. Missing usage is null; Type-1 worker/reviewer
 usage is known zero. Reasoning tokens are a subset of output, never added twice.
 Pi-derived or price-derived costs are estimates when billed cost is unavailable.
 OpenRouter calls use a fixed price ceiling without automatic provider fallback.
+They require support for the requested parameters and prefer throughput; a slow
+InferenceNet route made fixture validation take minutes despite low token cost.
 Estimates use that ceiling without assuming cache discounts, not the
 OpenRouter model listing's cheapest available route. The selector has an 8,192
 output-token cap including reasoning; label validation has a separate cap.

@@ -275,6 +275,14 @@ function toOutput(item: BenchmarkCase, selector: Selector, gold: GoldLabels[stri
     && (native?.source === "unavailable" || native?.assistantMessages === 0 || !native);
   const safeUsage = failedZeroIsUnknown ? null : usage.usage;
   const safeCost = failedZeroIsUnknown ? null : usage.usd;
+  const reportedReasoningTokens = result?.selectorResult?.reasoningTokens ?? native?.reasoningTokens
+    ?? usage.usage?.reasoningTokens ?? null;
+  const reasoningTokensExceedOutput = typeof reportedReasoningTokens === "number"
+    && typeof usage.usage?.outputTokens === "number" && reportedReasoningTokens > usage.usage.outputTokens;
+  const reasoningTokens = reasoningTokensExceedOutput ? null : reportedReasoningTokens;
+  const reasoningTokensWarning = reasoningTokensExceedOutput
+    ? "Reported reasoning tokens exceeded output tokens; normalized value set to null."
+    : usage.usage?.reasoningTokensWarning ?? null;
   const perSignal = result?.perSignal && SIGNAL_IDS.every(id => (OUTCOMES as readonly string[]).includes(result.perSignal?.[id] as string))
     ? result.perSignal as Record<SignalId, Outcome> : null;
   return { iterationId: runId, caseId: item.id, focus: item.focus, selector, source: "fresh",
@@ -286,7 +294,7 @@ function toOutput(item: BenchmarkCase, selector: Selector, gold: GoldLabels[stri
     decisions: { perSignal, status: result?.status ?? null, investigate: result?.investigate ?? null,
       selectorInvocations: result?.selectorInvocations ?? null, reviewInvocations: result?.reviewInvocations ?? null },
     rawReferences: result?.rawReferences ?? [], hashes: result?.hashes ?? null,
-    usage: safeUsage, reasoningTokens: result?.selectorResult?.reasoningTokens ?? native?.reasoningTokens ?? usage.usage?.reasoningTokens ?? null,
+    usage: safeUsage, reasoningTokens, reasoningTokensWarning,
     reasoningTokensAreOutputSubset: true, costUsd: safeCost,
     costProvenance: failedZeroIsUnknown ? "failed-control-zero-usage-untrusted" : usage.provenance,
     costUpperBoundUsd: reserve.reservedUsd, reservationId: reserve.id,
@@ -360,6 +368,7 @@ async function run(kind: "baseline" | "candidate" | "final", datasetKind: "devel
   const { dataset, labels, document } = frozen;
   const runId = new Date().toISOString().replace(/[:.]/g, "-") + "-" + slug(kind + "-" + (prompt?.version ?? pass ?? "")) + "-" + randomUUID().slice(0, 8);
   const directory = join(RESULTS, runId);
+  mkdirSync(RESULTS, { recursive: true });
   mkdirSync(directory);
   const prompts = promptInfo(prompt);
   const selectors: Selector[] = kind === "candidate" ? ["jev"] : ["jev", "subagent"];

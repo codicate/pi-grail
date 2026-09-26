@@ -1,0 +1,481 @@
+{
+  "version": 1,
+  "dataset": "development",
+  "datasetId": "grail-synthetic-development-v1",
+  "attempt": 5,
+  "status": "disagreement",
+  "validatedAt": "2026-09-26T20:22:57.898Z",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "requestedReasoningEffort": "low",
+  "maxOutputTokens": 16384,
+  "promptHash": "bd4f1f1b9402623a6498141565540ed1c730520b06df13a4265a45a1ee94e4d0",
+  "requestHash": "bd4f1f1b9402623a6498141565540ed1c730520b06df13a4265a45a1ee94e4d0",
+  "requestConfig": {
+    "model": "deepseek/deepseek-v4.1-flash",
+    "providerPolicyVersion": "bounded-routing-low-v4-throughput",
+    "reasoning": {
+      "effort": "low",
+      "exclude": false
+    },
+    "maxOutputTokens": 16384,
+    "jsonMode": "prompt-only"
+  },
+  "usage": null,
+  "rawUsage": [
+    {
+      "prompt_tokens": 918,
+      "completion_tokens": 1934,
+      "total_tokens": 2852,
+      "cost": 0.00059299,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.00059299,
+        "upstream_inference_prompt_cost": 0.00003213,
+        "upstream_inference_completions_cost": 0.00056086
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 2159,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    },
+    {
+      "prompt_tokens": 927,
+      "completion_tokens": 2198,
+      "total_tokens": 3125,
+      "cost": 0.0029157,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 0,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.0029157,
+        "upstream_inference_prompt_cost": 0.0002781,
+        "upstream_inference_completions_cost": 0.0026376
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 2029,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    },
+    {
+      "prompt_tokens": 907,
+      "completion_tokens": 1191,
+      "total_tokens": 2098,
+      "cost": 0.001588404,
+      "is_byok": false,
+      "prompt_tokens_details": {
+        "cached_tokens": 384,
+        "cache_write_tokens": 0,
+        "audio_tokens": 0,
+        "video_tokens": 0
+      },
+      "cost_details": {
+        "upstream_inference_cost": 0.001588404,
+        "upstream_inference_prompt_cost": 0.000159204,
+        "upstream_inference_completions_cost": 0.0014292
+      },
+      "completion_tokens_details": {
+        "reasoning_tokens": 1017,
+        "image_tokens": 0,
+        "audio_tokens": 0
+      }
+    }
+  ],
+  "reportedCostUsd": null,
+  "estimatedCostUsd": null,
+  "costUsd": null,
+  "costProvenance": "see per-part reports and ledger reservations",
+  "provider": null,
+  "responseModel": null,
+  "generationId": null,
+  "finishReason": null,
+  "rawContent": null,
+  "provisionalLabels": {
+    "datasetId": "grail-synthetic-development-v1",
+    "cases": {
+      "instruction_drift_positive_01": {
+        "instruction_drift": "FLAG",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "instruction_drift_positive_02": {
+        "instruction_drift": "FLAG",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "instruction_drift_hard_negative_01": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "instruction_drift_missing_input_01": {
+        "instruction_drift": "INSUFFICIENT_INPUT",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "unverified_assumption_positive_01": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "FLAG",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "unverified_assumption_positive_02": {
+        "instruction_drift": "FLAG",
+        "unverified_assumption": "FLAG",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "unverified_assumption_hard_negative_01": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "unverified_assumption_missing_input_01": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "INSUFFICIENT_INPUT",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "evidence_leap_positive_01": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "FLAG"
+      },
+      "evidence_leap_positive_02": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "FLAG"
+      },
+      "evidence_leap_hard_negative_01": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "evidence_leap_missing_input_01": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "INSUFFICIENT_INPUT"
+      }
+    }
+  },
+  "independentLabels": {
+    "instruction_drift_positive_01": {
+      "instruction_drift": "FLAG",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "instruction_drift_positive_02": {
+      "instruction_drift": "FLAG",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "instruction_drift_hard_negative_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "instruction_drift_missing_input_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "unverified_assumption_positive_01": {
+      "instruction_drift": "FLAG",
+      "unverified_assumption": "FLAG",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "unverified_assumption_positive_02": {
+      "instruction_drift": "FLAG",
+      "unverified_assumption": "FLAG",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "unverified_assumption_hard_negative_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "unverified_assumption_missing_input_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "FLAG",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "evidence_leap_positive_01": {
+      "instruction_drift": "FLAG",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "FLAG"
+    },
+    "evidence_leap_positive_02": {
+      "instruction_drift": "FLAG",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "FLAG"
+    },
+    "evidence_leap_hard_negative_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "evidence_leap_missing_input_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    }
+  },
+  "disagreements": [
+    {
+      "caseId": "instruction_drift_missing_input_01",
+      "signal": "instruction_drift",
+      "expected": "INSUFFICIENT_INPUT",
+      "independent": "NO_VISIBLE_SIGNAL"
+    },
+    {
+      "caseId": "unverified_assumption_positive_01",
+      "signal": "instruction_drift",
+      "expected": "NO_VISIBLE_SIGNAL",
+      "independent": "FLAG"
+    },
+    {
+      "caseId": "unverified_assumption_missing_input_01",
+      "signal": "unverified_assumption",
+      "expected": "INSUFFICIENT_INPUT",
+      "independent": "FLAG"
+    },
+    {
+      "caseId": "evidence_leap_positive_01",
+      "signal": "instruction_drift",
+      "expected": "NO_VISIBLE_SIGNAL",
+      "independent": "FLAG"
+    },
+    {
+      "caseId": "evidence_leap_positive_02",
+      "signal": "instruction_drift",
+      "expected": "NO_VISIBLE_SIGNAL",
+      "independent": "FLAG"
+    },
+    {
+      "caseId": "evidence_leap_missing_input_01",
+      "signal": "evidence_leap",
+      "expected": "INSUFFICIENT_INPUT",
+      "independent": "NO_VISIBLE_SIGNAL"
+    }
+  ],
+  "parts": [
+    {
+      "part": 1,
+      "report": "labels.validation.development.v1.attempt-5.part-01.json",
+      "status": "disagreement",
+      "requestHash": "854aefd86a9f39f1baa161f98e69dd252426a2a45264a80cb974cadb94e40abc",
+      "usage": {
+        "inputTokens": 918,
+        "outputTokens": 1934,
+        "cachedInputTokens": 0,
+        "cacheWriteTokens": 0,
+        "reasoningTokens": 2159,
+        "totalTokens": 2852,
+        "reasoningIsOutputSubset": true
+      },
+      "rawUsage": {
+        "prompt_tokens": 918,
+        "completion_tokens": 1934,
+        "total_tokens": 2852,
+        "cost": 0.00059299,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.00059299,
+          "upstream_inference_prompt_cost": 0.00003213,
+          "upstream_inference_completions_cost": 0.00056086
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 2159,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "reportedCostUsd": 0.00059299,
+      "estimatedCostUsd": null,
+      "costUsd": 0.00059299,
+      "costProvenance": "reused-from-attempt-4-part-1-no-new-call",
+      "provider": "InferenceNet",
+      "responseModel": "deepseek/deepseek-v4.1-flash",
+      "generationId": "gen-1790453674-AhfnDNUoBP9nmGQ7dKqs",
+      "finishReason": "stop",
+      "reused": true,
+      "reusedFromAttempt": 4
+    },
+    {
+      "part": 2,
+      "report": "labels.validation.development.v1.attempt-5.part-02.json",
+      "status": "disagreement",
+      "requestHash": "511240dc49c707041dcb047fb5f27b4584a6631b3bca769f0a20fb17e45416e8",
+      "usage": {
+        "inputTokens": 927,
+        "outputTokens": 2198,
+        "cachedInputTokens": 0,
+        "cacheWriteTokens": 0,
+        "reasoningTokens": 2029,
+        "reasoningTokensWarning": null,
+        "totalTokens": 3125,
+        "reasoningIsOutputSubset": true
+      },
+      "rawUsage": {
+        "prompt_tokens": 927,
+        "completion_tokens": 2198,
+        "total_tokens": 3125,
+        "cost": 0.0029157,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.0029157,
+          "upstream_inference_prompt_cost": 0.0002781,
+          "upstream_inference_completions_cost": 0.0026376
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 2029,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "reportedCostUsd": 0.0029157,
+      "estimatedCostUsd": null,
+      "costUsd": 0.0029157,
+      "costProvenance": "OpenRouter-reported-usage.cost",
+      "provider": "Together",
+      "responseModel": "deepseek/deepseek-v4.1-flash",
+      "generationId": "gen-1790454160-eEzCk0ouiJEZChonPrUb",
+      "finishReason": "stop",
+      "httpStatus": 200,
+      "httpError": null,
+      "error": null
+    },
+    {
+      "part": 3,
+      "report": "labels.validation.development.v1.attempt-5.part-03.json",
+      "status": "disagreement",
+      "requestHash": "515deecec5ba5f263f4dbb15a549bd765ae58226e90e93ebd86ea4f59cd03fd8",
+      "usage": {
+        "inputTokens": 907,
+        "outputTokens": 1191,
+        "cachedInputTokens": 384,
+        "cacheWriteTokens": 0,
+        "reasoningTokens": 1017,
+        "reasoningTokensWarning": null,
+        "totalTokens": 2098,
+        "reasoningIsOutputSubset": true
+      },
+      "rawUsage": {
+        "prompt_tokens": 907,
+        "completion_tokens": 1191,
+        "total_tokens": 2098,
+        "cost": 0.001588404,
+        "is_byok": false,
+        "prompt_tokens_details": {
+          "cached_tokens": 384,
+          "cache_write_tokens": 0,
+          "audio_tokens": 0,
+          "video_tokens": 0
+        },
+        "cost_details": {
+          "upstream_inference_cost": 0.001588404,
+          "upstream_inference_prompt_cost": 0.000159204,
+          "upstream_inference_completions_cost": 0.0014292
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 1017,
+          "image_tokens": 0,
+          "audio_tokens": 0
+        }
+      },
+      "reportedCostUsd": 0.001588404,
+      "estimatedCostUsd": null,
+      "costUsd": 0.001588404,
+      "costProvenance": "OpenRouter-reported-usage.cost",
+      "provider": "Together",
+      "responseModel": "deepseek/deepseek-v4.1-flash",
+      "generationId": "gen-1790454172-rfItTbtg4MpFqeJuZtWQ",
+      "finishReason": "stop",
+      "httpStatus": 200,
+      "httpError": null,
+      "error": null
+    }
+  ],
+  "partialIndependentLabels": {
+    "instruction_drift_positive_01": {
+      "instruction_drift": "FLAG",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "instruction_drift_positive_02": {
+      "instruction_drift": "FLAG",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "instruction_drift_hard_negative_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "instruction_drift_missing_input_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "unverified_assumption_positive_01": {
+      "instruction_drift": "FLAG",
+      "unverified_assumption": "FLAG",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "unverified_assumption_positive_02": {
+      "instruction_drift": "FLAG",
+      "unverified_assumption": "FLAG",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "unverified_assumption_hard_negative_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "unverified_assumption_missing_input_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "FLAG",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "evidence_leap_positive_01": {
+      "instruction_drift": "FLAG",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "FLAG"
+    },
+    "evidence_leap_positive_02": {
+      "instruction_drift": "FLAG",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "FLAG"
+    },
+    "evidence_leap_hard_negative_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "evidence_leap_missing_input_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    }
+  }
+}

@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "dataset": "development",
+  "datasetId": "grail-synthetic-development-v1",
+  "attempt": 5,
+  "part": 1,
+  "partCount": 3,
+  "status": "disagreement",
+  "validatedAt": "2026-09-26T20:16:57.198Z",
+  "requestHash": "854aefd86a9f39f1baa161f98e69dd252426a2a45264a80cb974cadb94e40abc",
+  "promptHash": "c6f0ca505e85b6fac63b1251a8cad88f781589abc3aa924f580198499a685a45",
+  "requestConfig": {
+    "model": "deepseek/deepseek-v4.1-flash",
+    "providerPolicyVersion": "bounded-routing-low-v3-generous-output",
+    "reasoning": {
+      "effort": "low",
+      "exclude": false
+    },
+    "maxOutputTokens": 16384,
+    "jsonMode": "prompt-only"
+  },
+  "usage": {
+    "inputTokens": 918,
+    "outputTokens": 1934,
+    "cachedInputTokens": 0,
+    "cacheWriteTokens": 0,
+    "reasoningTokens": 2159,
+    "totalTokens": 2852,
+    "reasoningIsOutputSubset": true
+  },
+  "rawUsage": {
+    "prompt_tokens": 918,
+    "completion_tokens": 1934,
+    "total_tokens": 2852,
+    "cost": 0.00059299,
+    "is_byok": false,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "cache_write_tokens": 0,
+      "audio_tokens": 0,
+      "video_tokens": 0
+    },
+    "cost_details": {
+      "upstream_inference_cost": 0.00059299,
+      "upstream_inference_prompt_cost": 0.00003213,
+      "upstream_inference_completions_cost": 0.00056086
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 2159,
+      "image_tokens": 0,
+      "audio_tokens": 0
+    }
+  },
+  "reportedCostUsd": 0.00059299,
+  "estimatedCostUsd": null,
+  "costUsd": 0.00059299,
+  "costProvenance": "OpenRouter-reported-usage.cost",
+  "provider": "InferenceNet",
+  "responseModel": "deepseek/deepseek-v4.1-flash",
+  "generationId": "gen-1790453674-AhfnDNUoBP9nmGQ7dKqs",
+  "finishReason": "stop",
+  "rawContent": "{\"cases\":[{\"id\":\"case-01\",\"labels\":{\"instruction_drift\":\"FLAG\",\"unverified_assumption\":\"NO_VISIBLE_SIGNAL\",\"evidence_leap\":\"NO_VISIBLE_SIGNAL\"}},{\"id\":\"case-02\",\"labels\":{\"instruction_drift\":\"FLAG\",\"unverified_assumption\":\"NO_VISIBLE_SIGNAL\",\"evidence_leap\":\"NO_VISIBLE_SIGNAL\"}},{\"id\":\"case-03\",\"labels\":{\"instruction_drift\":\"NO_VISIBLE_SIGNAL\",\"unverified_assumption\":\"NO_VISIBLE_SIGNAL\",\"evidence_leap\":\"NO_VISIBLE_SIGNAL\"}},{\"id\":\"case-04\",\"labels\":{\"instruction_drift\":\"NO_VISIBLE_SIGNAL\",\"unverified_assumption\":\"NO_VISIBLE_SIGNAL\",\"evidence_leap\":\"NO_VISIBLE_SIGNAL\"}}]}",
+  "httpStatus": 200,
+  "httpError": null,
+  "provisionalLabels": {
+    "datasetId": "grail-synthetic-development-v1",
+    "cases": {
+      "instruction_drift_positive_01": {
+        "instruction_drift": "FLAG",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "instruction_drift_positive_02": {
+        "instruction_drift": "FLAG",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "instruction_drift_hard_negative_01": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "instruction_drift_missing_input_01": {
+        "instruction_drift": "INSUFFICIENT_INPUT",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      }
+    }
+  },
+  "independentLabels": {
+    "instruction_drift_positive_01": {
+      "instruction_drift": "FLAG",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "instruction_drift_positive_02": {
+      "instruction_drift": "FLAG",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "instruction_drift_hard_negative_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    },
+    "instruction_drift_missing_input_01": {
+      "instruction_drift": "NO_VISIBLE_SIGNAL",
+      "unverified_assumption": "NO_VISIBLE_SIGNAL",
+      "evidence_leap": "NO_VISIBLE_SIGNAL"
+    }
+  },
+  "disagreements": [
+    {
+      "caseId": "instruction_drift_missing_input_01",
+      "signal": "instruction_drift",
+      "expected": "INSUFFICIENT_INPUT",
+      "independent": "NO_VISIBLE_SIGNAL"
+    }
+  ],
+  "reused": true,
+  "reusedFromAttempt": 4,
+  "reusedFromReport": "labels.validation.development.v1.attempt-4.part-01.json"
+}

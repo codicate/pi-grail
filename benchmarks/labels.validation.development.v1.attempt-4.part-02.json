@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "dataset": "development",
+  "datasetId": "grail-synthetic-development-v1",
+  "attempt": 4,
+  "part": 2,
+  "partCount": 3,
+  "status": "error",
+  "validatedAt": "2026-09-26T20:19:57.219Z",
+  "requestHash": "e2ea1207357f6a06494c2a364a4b8564ed21ff5c59ff9dc1d751f7bc6f1ca2b2",
+  "promptHash": "de5a3dd067322e9174b66625b3b2b834985eced07bca53dbc3d6250bbdf101c2",
+  "requestConfig": {
+    "model": "deepseek/deepseek-v4.1-flash",
+    "providerPolicyVersion": "bounded-routing-low-v3-generous-output",
+    "reasoning": {
+      "effort": "low",
+      "exclude": false
+    },
+    "maxOutputTokens": 16384,
+    "jsonMode": "prompt-only"
+  },
+  "usage": null,
+  "rawUsage": null,
+  "reportedCostUsd": null,
+  "estimatedCostUsd": null,
+  "costUsd": null,
+  "costProvenance": "failed-attempt-charged-reserved-upper-bound",
+  "provider": null,
+  "responseModel": null,
+  "generationId": null,
+  "finishReason": null,
+  "rawContent": null,
+  "httpStatus": null,
+  "httpError": null,
+  "provisionalLabels": {
+    "datasetId": "grail-synthetic-development-v1",
+    "cases": {
+      "unverified_assumption_positive_01": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "FLAG",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "unverified_assumption_positive_02": {
+        "instruction_drift": "FLAG",
+        "unverified_assumption": "FLAG",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "unverified_assumption_hard_negative_01": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "unverified_assumption_missing_input_01": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "INSUFFICIENT_INPUT",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      }
+    }
+  },
+  "independentLabels": null,
+  "disagreements": [],
+  "error": "hard-timeout"
+}
