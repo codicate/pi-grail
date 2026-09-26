@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "dataset": "development",
+  "datasetId": "grail-synthetic-development-v1",
+  "status": "error",
+  "validatedAt": "2026-09-26T19:59:44.647Z",
+  "model": "deepseek/deepseek-v4.1-flash",
+  "requestedReasoningEffort": "low",
+  "maxOutputTokens": 4096,
+  "promptHash": "8662414dcd0fe5d2b3ea944fb6e46aa2bbe8bc968c8f52870dea10dbf56e8988",
+  "requestHash": "ce66a763f2fa38beace70f27d6f0859432216f7aaf7b40c34e3fa90f17425536",
+  "usage": {
+    "inputTokens": 1922,
+    "outputTokens": 4096,
+    "cachedInputTokens": 0,
+    "cacheWriteTokens": 0,
+    "reasoningTokens": 0,
+    "totalTokens": 6018,
+    "reasoningIsOutputSubset": true
+  },
+  "estimatedCostUsd": 0.0054918,
+  "costProvenance": "OpenRouter-reported-usage.cost",
+  "provisionalLabels": {
+    "datasetId": "grail-synthetic-development-v1",
+    "cases": {
+      "instruction_drift_positive_01": {
+        "instruction_drift": "FLAG",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "instruction_drift_positive_02": {
+        "instruction_drift": "FLAG",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "instruction_drift_hard_negative_01": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "instruction_drift_missing_input_01": {
+        "instruction_drift": "INSUFFICIENT_INPUT",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "unverified_assumption_positive_01": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "FLAG",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "unverified_assumption_positive_02": {
+        "instruction_drift": "FLAG",
+        "unverified_assumption": "FLAG",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "unverified_assumption_hard_negative_01": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "unverified_assumption_missing_input_01": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "INSUFFICIENT_INPUT",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "evidence_leap_positive_01": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "FLAG"
+      },
+      "evidence_leap_positive_02": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "FLAG"
+      },
+      "evidence_leap_hard_negative_01": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "NO_VISIBLE_SIGNAL"
+      },
+      "evidence_leap_missing_input_01": {
+        "instruction_drift": "NO_VISIBLE_SIGNAL",
+        "unverified_assumption": "NO_VISIBLE_SIGNAL",
+        "evidence_leap": "INSUFFICIENT_INPUT"
+      }
+    }
+  },
+  "independentLabels": null,
+  "disagreements": [],
+  "error": "request-or-label-validation-failed"
+}

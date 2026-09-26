@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "ceilingUsd": 1,
+  "finalReserveUsd": 0.2,
+  "openedAt": "2026-09-26T19:59:31.085Z",
+  "calls": [
+    {
+      "kind": "fixture-label-validation",
+      "selector": "deepseek/deepseek-v4.1-flash",
+      "caseId": "grail-synthetic-development-v1",
+      "promptHash": "8662414dcd0fe5d2b3ea944fb6e46aa2bbe8bc968c8f52870dea10dbf56e8988",
+      "reservedUsd": 0.0017848,
+      "phase": "development",
+      "id": "10b2512b-ad3c-41d9-897f-84272aaffd35",
+      "status": "failed",
+      "startedAt": "2026-09-26T19:59:31.085Z",
+      "settledUsd": 0.0054918,
+      "committedUsd": 0.0054918,
+      "costProvenance": "OpenRouter-reported-usage.cost",
+      "settledAt": "2026-09-26T19:59:44.646Z",
+      "error": "request-or-label-validation-failed"
+    },
+    {
+      "kind": "fixture-label-validation",
+      "selector": "deepseek/deepseek-v4.1-flash",
+      "caseId": "grail-synthetic-development-v1:attempt-2",
+      "promptHash": "addd818d0b3c33208b5029cc0c3d44f8f6b4c1470f135793fae92a4ef1bc3805",
+      "reservedUsd": 0.014960099999999999,
+      "phase": "development",
+      "id": "3cd75970-d4d8-42e2-8c73-db6fb8e3026d",
+      "status": "failed",
+      "startedAt": "2026-09-26T20:05:58.992Z",
+      "settledUsd": null,
+      "committedUsd": 0.014960099999999999,
+      "costProvenance": "failed-attempt-charged-reserved-upper-bound",
+      "settledAt": "2026-09-26T20:05:59.187Z",
+      "error": "http-404"
+    },
+    {
+      "kind": "fixture-label-validation",
+      "selector": "deepseek/deepseek-v4.1-flash",
+      "caseId": "grail-synthetic-development-v1:attempt-3",
+      "promptHash": "edc3cd859288e2c5a745cbddf6e9836d67a653d84fdc583c2e251237932a21f0",
+      "reservedUsd": 0.0149595,
+      "phase": "development",
+      "id": "3338d92a-65f4-49a0-897a-67f04fac5563",
+      "status": "failed",
+      "startedAt": "2026-09-26T20:07:12.592Z",
+      "settledUsd": null,
+      "committedUsd": 0.0149595,
+      "costProvenance": "unknown-after-external-timeout-full-reservation-retained",
+      "settledAt": "2026-09-26T20:10:18.113Z",
+      "error": "externally-stopped-after-180s"
+    }
+  ]
+}

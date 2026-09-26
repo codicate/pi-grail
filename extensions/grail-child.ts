@@ -1,4 +1,5 @@
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
+import { OPENROUTER_PROVIDER_POLICY, SELECTOR_OUTPUT_TOKENS } from "../src/runtime-policy.js";
 import {
   addNativeUsage, clampProviderPayload, classifyFlags, decodeLaunchTask, getLiveLaunch,
   isLiveWorkerRole, isReadonlyReviewTool, semanticCheckpointFingerprint, signalStatus, snapshotLiveTelemetry,
@@ -51,7 +52,7 @@ function setLimit(runtime: LiveLaunchRuntime, reason: string, ctx: { abort(): vo
 
 function maxTokens(runtime: LiveLaunchRuntime) {
   switch (runtime.envelope.role) {
-    case "grail-selector": return 512;
+    case "grail-selector": return SELECTOR_OUTPUT_TOKENS;
     case "grail-reviewer": return 512;
     case "grail-worker": return 1024;
   }
@@ -189,7 +190,9 @@ export default function registerGrailChild(pi: ExtensionAPI) {
       return event.payload;
     }
     active.telemetry.providerRequests = next;
-    return clampProviderPayload(event.payload, maxTokens(active));
+    const payload = clampProviderPayload(event.payload, maxTokens(active));
+    return payload && typeof payload === "object"
+      ? { ...payload, provider: OPENROUTER_PROVIDER_POLICY } : payload;
   });
 
   pi.on("message_start", event => {

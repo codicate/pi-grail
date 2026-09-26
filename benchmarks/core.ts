@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { DEEPSEEK_ESTIMATE_PRICING } from "../src/runtime-policy.js";
 
 export const SIGNAL_IDS = ["instruction_drift", "unverified_assumption", "evidence_leap"] as const;
 export const OUTCOMES = ["FLAG", "NO_VISIBLE_SIGNAL", "INSUFFICIENT_INPUT"] as const;
@@ -21,10 +22,10 @@ export const SCORING_VERSION = "per-signal-exact-and-aggregate-investigate-v1";
 export const PRICES = {
   snapshotDate: "2026-09-26",
   selector: "openrouter/deepseek/deepseek-v4.1-flash",
-  selectorSource: "OpenRouter model pricing API checked 2026-09-26",
-  selectorInputUsdPerMillion: 0.035,
-  selectorCachedInputUsdPerMillion: 0.001,
-  selectorOutputUsdPerMillion: 0.29,
+  selectorSource: "OpenRouter max-price route ceiling checked 2026-09-26; estimates only, actual route may be cheaper",
+  selectorInputUsdPerMillion: DEEPSEEK_ESTIMATE_PRICING.inputUsdPerMillion,
+  selectorCachedInputUsdPerMillion: DEEPSEEK_ESTIMATE_PRICING.cacheReadUsdPerMillion,
+  selectorOutputUsdPerMillion: DEEPSEEK_ESTIMATE_PRICING.outputUsdPerMillion,
   jevModel: "jev-1.13.0",
   jevSource: "TypeSafe models API checked 2026-09-26",
   jevInputUsdPerMillion: 0.042,
@@ -93,7 +94,8 @@ export function computedCost(selector: Selector, usage: NormalizedUsage | null):
   const nonCached = usage.inputTokens - cached;
   const usd = (nonCached * inputRate + cached * cachedRate + usage.outputTokens * outputRate) / 1_000_000;
   const cacheNote = usage.cachedInputTokens === null ? "; cached-read count unavailable, full input charged at standard input rate" : "";
-  return { usd, provenance: "estimated-from-" + PRICES.snapshotDate + "-price-snapshot" + cacheNote };
+  const rateNote = selector === "subagent" ? "-max-route-ceiling" : "-listed-rates";
+  return { usd, provenance: "estimated-from-" + PRICES.snapshotDate + rateNote + cacheNote };
 }
 
 export function reservationUpperBound(selector: Selector, promptUtf8Bytes: number, outputTokenCap: number,
@@ -163,6 +165,7 @@ export function controlCacheKey(args: {
   dataset: unknown;
   labels: unknown;
   controlPrompt: unknown;
+  runtimePolicy: unknown;
   sharedLogicSourceHash: string;
   runtimeVersions: unknown;
   model: string;
@@ -170,7 +173,7 @@ export function controlCacheKey(args: {
   limits: unknown;
 }) {
   return hash({ dataset: args.dataset, labels: args.labels, controlPrompt: args.controlPrompt,
-    sharedLogicSourceHash: args.sharedLogicSourceHash,
+    runtimePolicy: args.runtimePolicy, sharedLogicSourceHash: args.sharedLogicSourceHash,
     packing: PACKING_VERSION, scoring: SCORING_VERSION, runtimeVersions: args.runtimeVersions,
     model: args.model, thinking: args.thinking, limits: args.limits });
 }

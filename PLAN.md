@@ -128,3 +128,22 @@ Acceptance is deliberately small:
 - Results and cache provenance are saved, limits work, and the final report identifies the best version and any unmet goals.
 
 No production-hardening project, large test suite, or E2E benchmark in this phase.
+
+## Subsequent user-authorized scope update (2026-09-26)
+
+While Type-1 tuning runs, a Luna-max agent independently verifies and implements
+one E2E demo adapted from agent-memory-bench's xs-evolve-lease. Implement only;
+do not execute either E2E arm yet. Both arms use identical isolated starting
+files, historical memory, worker settings, and shared reviewer. Record actual
+visible signals rather than assuming stale memory must trigger a gate. The
+checker grades its narrow heartbeat contract, not real-world lease robustness.
+The user authorized up to most of $10 of DeepSeek credit; retain the tighter
+$1 Type-1 ceiling because the current experiment does not need more.
+
+Runtime correction before baselines: apply an OpenRouter route-price ceiling,
+disable provider fallback, and reserve using that ceiling without assuming cache
+discounts. A trial pinned DeepSeek route returned HTTP 404 and was removed before
+baseline execution. Pi catalog-derived cost is an estimate, not billed cost. Give the generic
+selector 2,048 output tokens including reasoning. Preserve the failed first
+label-validation attempt; any corrected validation attempt must be explicit,
+separately recorded, and charged to the same ledger.

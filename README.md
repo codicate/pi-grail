@@ -82,7 +82,8 @@ in .pi/settings.json for bounded POC runs.
 Type 1 evaluates selection only, using 12 development cases and three held-back
 cases. Intended labels are independently validated once with DeepSeek-low and
 then frozen. No workers, reviewers, or per-iteration judges run in Type 1.
-E2E benchmarking is out of scope.
+The one-case E2E runner is being prepared separately; E2E execution is not part
+of this tuning phase and requires a later explicit run.
 
 Timing includes actual production-Pi child startup and parsing for the control;
 common parent startup is recorded separately. Calls run serially, interleaving
@@ -99,6 +100,10 @@ Shared preparation, A/B gates, live workers/reviewers, and label validation are
 separate accounting buckets. Missing usage is null; Type-1 worker/reviewer
 usage is known zero. Reasoning tokens are a subset of output, never added twice.
 Pi-derived or price-derived costs are estimates when billed cost is unavailable.
+OpenRouter calls use a fixed price ceiling without automatic provider fallback.
+Estimates use that ceiling without assuming cache discounts, not the
+OpenRouter model listing's cheapest available route. The selector has a 2,048
+output-token cap including reasoning; label validation has a separate cap.
 The delegation DTO omits reasoning counts; native child telemetry supplements
 it where available, without treating absent values as measured zeros.
 

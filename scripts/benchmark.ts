@@ -7,6 +7,7 @@ import { randomUUID } from "node:crypto";
 import { CONTROL_SIGNAL_CONTRACT, CONTROL_SYSTEM_PROMPT, DEFAULT_JEV_PROMPTS, DEFAULT_JEV_PROMPT_VERSION,
   JEV_MODEL, controlTask, judgmentContract, parseControl, preparePacket } from "../src/selector.js";
 import { productionPi } from "./production-pi.mjs";
+import { OPENROUTER_PROVIDER_POLICY, RUNTIME_POLICY_VERSION, SELECTOR_OUTPUT_TOKENS } from "../src/runtime-policy.js";
 import { OUTCOMES, PRICES, SCORING_VERSION, SIGNAL_IDS, computedCost, controlCacheKey, hash,
   normalizeUsage, reservationUpperBound, score, type BenchmarkCase, type GoldLabels,
   type NormalizedUsage, type Outcome, type Selector, type SignalId } from "../benchmarks/core.js";
@@ -19,7 +20,7 @@ const BENCH = join(ROOT, "benchmarks");
 const RESULTS = join(BENCH, "results");
 const STATE = join(BENCH, "state");
 const CACHE = join(BENCH, "cache", "controls");
-const MAX_OUTPUT_TOKENS = 512;
+const MAX_OUTPUT_TOKENS = SELECTOR_OUTPUT_TOKENS;
 const BATCH_TIMEOUT_MS = 900_000;
 
 type Dataset = { datasetId: string; heldBackUntilFinal?: boolean; cases: BenchmarkCase[] };
@@ -140,6 +141,7 @@ function sharedSourceHash() {
     controlTask: String(controlTask), parseControl: String(parseControl), scoring: String(score),
     usageNormalization: String(normalizeUsage), costAccounting: String(computedCost),
     gateAdapter: readFileSync(join(ROOT, "src/grail.ts"), "utf8"),
+    runtimePolicy: readFileSync(join(ROOT, "src/runtime-policy.ts"), "utf8"),
     benchmarkScoringAndAccounting: readFileSync(join(ROOT, "benchmarks/core.ts"), "utf8"),
     packingVersion: "packet-v1-json-utf8-16k-no-truncate", scoringVersion: SCORING_VERSION });
 }
@@ -148,11 +150,19 @@ function runtime() {
   try { pi = execFileSync(productionPi(), ["--version"], { cwd: ROOT, encoding: "utf8", timeout: 10000 }).trim(); }
   catch { /* keep unavailable explicit */ }
   const pkg = readJson<{ dependencies?: Record<string, string>; devDependencies?: Record<string, string> }>(join(ROOT, "package.json"));
-  return { node: process.version, productionPi: pi, piSubagents: pkg.devDependencies?.["pi-subagents"] ?? null,
-    typesafeSdk: pkg.dependencies?.["@typesafe-ai/sdk"] ?? null };
+  const installedVersion = (name: string) => {
+    try { return readJson<{ version?: string }>(join(ROOT, "node_modules", name, "package.json")).version ?? null; }
+    catch { return null; }
+  };
+  return { node: process.version, productionPi: pi,
+    piSubagentsInstalled: installedVersion("pi-subagents"), piSubagentsDeclared: pkg.devDependencies?.["pi-subagents"] ?? null,
+    typesafeSdkInstalled: installedVersion("@typesafe-ai/sdk"), typesafeSdkDeclared: pkg.dependencies?.["@typesafe-ai/sdk"] ?? null,
+    runtimePolicyVersion: RUNTIME_POLICY_VERSION, providerPolicy: OPENROUTER_PROVIDER_POLICY };
 }
 function frozenControlKey(dataset: Dataset, labels: GoldLabels, versions: unknown) {
-  return controlCacheKey({ dataset, labels, controlPrompt: controlPrompt(), sharedLogicSourceHash: sharedSourceHash(),
+  return controlCacheKey({ dataset, labels, controlPrompt: controlPrompt(),
+    runtimePolicy: { version: RUNTIME_POLICY_VERSION, provider: OPENROUTER_PROVIDER_POLICY },
+    sharedLogicSourceHash: sharedSourceHash(),
     runtimeVersions: versions, model: PRICES.selector, thinking: "low",
     limits: { packetUtf8Bytes: 16_000, outputTokens: MAX_OUTPUT_TOKENS, callsPerCase: 1, reviewers: 0 } });
 }
@@ -246,13 +256,9 @@ async function launchBatch(directory: string, items: ReturnType<typeof makeBatch
 
 function cost(selector: Selector, raw: unknown) {
   const usage = normalizeUsage(raw);
-  if (raw && typeof raw === "object") {
-    const fields = raw as Record<string, unknown>;
-    const reported = fields.costUsd ?? fields.totalCostUsd ?? fields.totalCost;
-    if (typeof reported === "number" && Number.isFinite(reported) && reported >= 0) {
-      return { usage, usd: reported, provenance: "Pi-runtime-reported-cost-field" };
-    }
-  }
+  // Pi's usage.cost is computed from its local model catalog, not the actual
+  // provider invoice. Treat both selector arms' locally derived cost as absent
+  // and estimate from the explicitly recorded rate snapshots instead.
   const estimate = computedCost(selector, usage);
   return { usage, usd: estimate.usd, provenance: estimate.provenance };
 }
@@ -310,9 +316,12 @@ function usageBucket(rows: OutputRow[]) {
 function costBucket(rows: OutputRow[]) {
   const observed = rows.map(row => row.costUsd).filter((value): value is number => typeof value === "number");
   const bounds = rows.map(row => row.costUpperBoundUsd).filter((value): value is number => typeof value === "number");
+  const provenanceCounts = Object.fromEntries([...new Set(rows.map(row => String(row.costProvenance ?? "unknown")))].map(provenance =>
+    [provenance, rows.filter(row => row.costProvenance === provenance && typeof row.costUsd === "number").length]));
   return { observedCalls: observed.length, unknownCostCalls: rows.length - observed.length,
-    observedEstimatedTotalUsd: observed.length ? observed.reduce((a, b) => a + b, 0) : null,
-    meanObservedEstimatedUsd: observed.length ? observed.reduce((a, b) => a + b, 0) / observed.length : null,
+    observedTotalUsd: observed.length ? observed.reduce((a, b) => a + b, 0) : null,
+    meanObservedUsd: observed.length ? observed.reduce((a, b) => a + b, 0) / observed.length : null,
+    provenanceCounts,
     reservedUpperBoundUsd: bounds.length === rows.length ? bounds.reduce((a, b) => a + b, 0) : null };
 }
 function fixtureValidationBucket() {
@@ -321,7 +330,7 @@ function fixtureValidationBucket() {
   const observed = calls.map(call => call.settledUsd).filter((value): value is number => typeof value === "number");
   return { source: relative(LEDGER_PATH), separateFromGateRows: true, calls: calls.length,
     unknownCostCalls: calls.length - observed.length,
-    observedEstimatedTotalUsd: observed.length ? observed.reduce((a, b) => a + b, 0) : null,
+    observedTotalUsd: observed.length ? observed.reduce((a, b) => a + b, 0) : null,
     reservedUpperBoundUsd: calls.length ? calls.reduce((sum, call) => sum + call.reservedUsd, 0) : null,
     provenance: "cumulative fixture validation expense from the ledger; distinct from per-gate estimates" };
 }
@@ -385,7 +394,14 @@ async function run(kind: "baseline" | "candidate" | "final", datasetKind: "devel
     datasetId: dataset.datasetId, createdAt: new Date().toISOString(), caseCount: dataset.cases.length,
     promptVersion: prompts.version, promptHash: hash(prompts.contract), controlPromptHash: hash(controlPrompt()),
     models: { jev: JEV_MODEL, control: PRICES.selector }, effort: { jev: "native-choice", control: "low" },
+    providerPolicy: { version: RUNTIME_POLICY_VERSION, openrouter: OPENROUTER_PROVIDER_POLICY },
     maxPacketBytes: 16_000, outputTokenCap: MAX_OUTPUT_TOKENS,
+    costPolicy: { billedCostsUnavailableForSelectorCalls: true,
+      piSubagentsUsageCost: "local model-catalog estimate; ignored in costUsd and retained only in raw trace",
+      selectorEstimateRatesUsdPerMillion: { input: PRICES.selectorInputUsdPerMillion,
+        cacheRead: PRICES.selectorCachedInputUsdPerMillion, output: PRICES.selectorOutputUsdPerMillion },
+      JevEstimateRatesUsdPerMillion: { input: PRICES.jevInputUsdPerMillion,
+        cacheRead: PRICES.jevCachedInputUsdPerMillion, output: PRICES.jevOutputUsdPerMillion } },
     reviewerCalls: 0, reviewerTokens: 0, workerCalls: 0, workerTokens: 0, retries: 0,
     selectorOrder: "serial; Jev then control for each case, identical packet; timing runs are not parallel",
     controlCacheKey: cacheKey, runtime: versions, prices: PRICES, labelHash: hash(labels),
@@ -463,7 +479,12 @@ async function run(kind: "baseline" | "candidate" | "final", datasetKind: "devel
         provenance: "known zero in selector-only Type 1" },
       selectorGate: Object.fromEntries((["jev", "subagent"] as const).map(arm => {
         const armRows = output.filter(row => row.selector === arm);
-        return [arm, { calls: armRows.length, usage: usageBucket(armRows), cost: costBucket(armRows) }];
+        const freshRows = armRows.filter(row => row.source === "fresh");
+        const historicalRows = armRows.filter(row => row.source === "historical-control-cache");
+        return [arm, { calls: freshRows.length, scoredRows: armRows.length, historicalRows: historicalRows.length,
+          usage: usageBucket(freshRows), cost: costBucket(freshRows),
+          comparisonUsageIncludingHistoricalRows: usageBucket(armRows),
+          comparisonCostIncludingHistoricalRows: costBucket(armRows) }];
       })),
       reviewer: { calls: 0, inputTokens: 0, outputTokens: 0, reasoningTokens: 0, costUsd: 0,
         provenance: "known zero in selector-only Type 1" },
