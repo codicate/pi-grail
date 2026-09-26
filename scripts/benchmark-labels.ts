@@ -3,26 +3,29 @@ import { homedir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  computedCost, hash, normalizeUsage, OUTCOMES, PRICES, reservationUpperBound, SIGNAL_IDS,
+  hash, normalizeUsage, OUTCOMES, PRICES, SIGNAL_IDS,
   type BenchmarkCase, type GoldLabels, type Outcome, type SignalId,
 } from "../benchmarks/core.js";
 import { FINAL_RESERVE_USD, LEDGER_PATH, reserveCalls, snapshot, settleCall, TOTAL_LIMIT_USD } from "../benchmarks/ledger.js";
+import { DEEPSEEK_ESTIMATE_PRICING, OPENROUTER_PROVIDER_POLICY, RUNTIME_POLICY_VERSION } from "../src/runtime-policy.js";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 export const HELD_BACK_OPENED_PATH = join(ROOT, "benchmarks/state/heldback-opened.json");
 const MODEL = "deepseek/deepseek-v4.1-flash";
-const MAX_OUTPUT_TOKENS = 4_096;
+const MAX_OUTPUT_TOKENS = 16_384;
 const REQUEST_TIMEOUT_MS = 120_000;
 const SIGNALS = SIGNAL_IDS as readonly SignalId[];
 const VALID_OUTCOMES = OUTCOMES as readonly Outcome[];
 
 type Dataset = "development" | "heldback";
+type Attempt = 1 | 2 | 3 | 4;
 type ValidationStatus = "agreement" | "disagreement" | "error";
 type Disagreement = { caseId: string; signal: SignalId; expected: Outcome; independent: Outcome };
 type ValidationReport = {
   version: 1;
   dataset: Dataset;
   datasetId: string;
+  attempt: Attempt;
   status: ValidationStatus;
   validatedAt: string;
   model: string;
@@ -30,22 +33,42 @@ type ValidationReport = {
   maxOutputTokens: number;
   promptHash: string;
   requestHash: string;
+  requestConfig: {
+    model: string;
+    providerPolicyVersion: string;
+    reasoning: { effort: "low"; exclude: false };
+    maxOutputTokens: number;
+    jsonMode: "prompt-only";
+  };
   usage: ReturnType<typeof normalizeUsage>;
+  rawUsage: unknown | null;
+  reportedCostUsd: number | null;
   estimatedCostUsd: number | null;
+  costUsd: number | null;
   costProvenance: string;
+  provider: string | null;
+  responseModel: string | null;
+  generationId: string | null;
+  finishReason: string | null;
+  rawContent: string | null;
+  httpStatus?: number | null;
+  httpError?: { status: number; message: string | null; code: string | number | null; provider: string | null } | null;
   provisionalLabels: { datasetId: string; cases: GoldLabels } | null;
   independentLabels: GoldLabels | null;
   finalSelection?: { selectedVersion: string; promptHash: string };
   disagreements: Disagreement[];
+  parts?: unknown[];
+  partialIndependentLabels?: GoldLabels;
   error?: string;
 };
 
-function datasetPaths(dataset: Dataset) {
+function datasetPaths(dataset: Dataset, attempt: Attempt = 1) {
   const filePart = dataset === "development" ? "development" : "heldback";
+  const attemptSuffix = attempt === 1 ? "" : `.attempt-${attempt}`;
   return {
     cases: join(ROOT, `benchmarks/cases.${filePart}.v1.json`),
     labels: join(ROOT, `benchmarks/labels.${filePart}.v1.json`),
-    validation: join(ROOT, `benchmarks/labels.validation.${filePart}.v1.json`),
+    validation: join(ROOT, `benchmarks/labels.validation.${filePart}.v1${attemptSuffix}.json`),
     frozen: join(ROOT, `benchmarks/labels.${filePart}.frozen.json`),
   };
 }
@@ -113,7 +136,7 @@ const LABEL_PROMPT = [
   "Return exactly this JSON shape, with all supplied case IDs once and no extra fields: {\"cases\":[{\"id\":\"case id\",\"labels\":{\"instruction_drift\":\"FLAG|NO_VISIBLE_SIGNAL|INSUFFICIENT_INPUT\",\"unverified_assumption\":\"FLAG|NO_VISIBLE_SIGNAL|INSUFFICIENT_INPUT\",\"evidence_leap\":\"FLAG|NO_VISIBLE_SIGNAL|INSUFFICIENT_INPUT\"}}]}.",
 ].join("\n");
 
-export function buildLabelRequest(datasetId: string, cases: BenchmarkCase[]) {
+export function buildLabelRequest(datasetId: string, cases: BenchmarkCase[], maxOutputTokens = MAX_OUTPUT_TOKENS) {
   // Intentionally omit focus and all provisional labels from the model-visible payload.
   const userPayload = { datasetId, cases: cases.map(({ packet }, index) => ({ id: neutralCaseId(index), packet })) };
   return {
@@ -122,10 +145,10 @@ export function buildLabelRequest(datasetId: string, cases: BenchmarkCase[]) {
       { role: "system", content: LABEL_PROMPT },
       { role: "user", content: JSON.stringify(userPayload) },
     ],
-    reasoning: { effort: "low", exclude: true },
+    reasoning: { effort: "low", exclude: false },
+    provider: OPENROUTER_PROVIDER_POLICY,
     temperature: 0,
-    max_tokens: MAX_OUTPUT_TOKENS,
-    response_format: { type: "json_object" },
+    max_tokens: maxOutputTokens,
   };
 }
 
@@ -137,7 +160,7 @@ function disagreements(expected: GoldLabels, actual: GoldLabels, caseIds: string
   }]));
 }
 
-function reportPath(dataset: Dataset) { return datasetPaths(dataset).validation; }
+function reportPath(dataset: Dataset, attempt: Attempt) { return datasetPaths(dataset, attempt).validation; }
 function writeNewJson(path: string, value: unknown) {
   mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, JSON.stringify(value, null, 2) + "\n", { flag: "wx", mode: 0o600 });
@@ -172,8 +195,23 @@ function readOpenRouterKey(): string {
   throw new Error("OpenRouter auth is unavailable. Configure OPENROUTER_API_KEY or run npm run pi:auth.");
 }
 
-function existingAttempt(datasetId: string) {
-  return snapshot(LEDGER_PATH).calls.some(call => call.kind === "fixture-label-validation" && call.caseId === datasetId);
+function attemptLedgerId(datasetId: string, attempt: Attempt) {
+  // Attempt one predates explicit attempt IDs; preserve its immutable ledger record.
+  return attempt === 1 ? datasetId : `${datasetId}:attempt-${attempt}`;
+}
+
+function attempt4PartLedgerId(datasetId: string, part: number) {
+  return `${datasetId}:attempt-4-part-${String(part).padStart(2, "0")}`;
+}
+
+function hasAttempt4Ledger(datasetId: string) {
+  const prefix = `${datasetId}:attempt-4-part-`;
+  return snapshot(LEDGER_PATH).calls.some(call => call.kind === "fixture-label-validation" && call.caseId?.startsWith(prefix));
+}
+
+function existingAttempt(datasetId: string, attempt: Attempt) {
+  const ledgerCaseId = attemptLedgerId(datasetId, attempt);
+  return snapshot(LEDGER_PATH).calls.some(call => call.kind === "fixture-label-validation" && call.caseId === ledgerCaseId);
 }
 
 function compareLabelFiles(labels: unknown, independentLabels: GoldLabels, caseIds: string[]) {
@@ -181,9 +219,9 @@ function compareLabelFiles(labels: unknown, independentLabels: GoldLabels, caseI
   return disagreements(labels.cases as GoldLabels, independentLabels, caseIds);
 }
 
-function freezeLabels(dataset: Dataset, datasetId: string, labels: Record<string, unknown>,
+function freezeLabels(dataset: Dataset, datasetId: string, attempt: Attempt, labels: Record<string, unknown>,
   validation: ValidationReport, resolutionNote?: string) {
-  const paths = datasetPaths(dataset);
+  const paths = datasetPaths(dataset, attempt);
   if (existsSync(paths.frozen)) throw new Error(`Frozen labels already exist at ${paths.frozen}; they will not be overwritten.`);
   if (!validation.independentLabels || validation.status === "error") throw new Error("A successful independent validation is required before freezing labels.");
   const caseIds = Object.keys(validation.independentLabels);
@@ -196,10 +234,12 @@ function freezeLabels(dataset: Dataset, datasetId: string, labels: Record<string
     datasetId,
     labelStatus: "frozen",
     validation: {
+      attempt: validation.attempt,
       report: paths.validation.split(/[\\/]/).at(-1),
       validatedAt: validation.validatedAt,
       model: validation.model,
       promptHash: validation.promptHash,
+      requestHash: validation.requestHash,
       independentLabelsHash: hash(validation.independentLabels),
       disagreementsAfterResolution: currentDisagreements,
       resolutionNote: resolutionNote?.trim() || null,
@@ -210,34 +250,240 @@ function freezeLabels(dataset: Dataset, datasetId: string, labels: Record<string
   return paths.frozen;
 }
 
-async function validateLabels(dataset: Dataset, final: boolean) {
+function estimateFromRuntimePolicy(usage: ReturnType<typeof normalizeUsage>) {
+  if (!usage || usage.inputTokens === null || usage.outputTokens === null) {
+    return { usd: null, provenance: "unavailable-usage" };
+  }
+  const cached = Math.min(usage.cachedInputTokens ?? 0, usage.inputTokens);
+  const usd = ((usage.inputTokens - cached) * DEEPSEEK_ESTIMATE_PRICING.inputUsdPerMillion
+    + cached * DEEPSEEK_ESTIMATE_PRICING.cacheReadUsdPerMillion
+    + usage.outputTokens * DEEPSEEK_ESTIMATE_PRICING.outputUsdPerMillion) / 1_000_000;
+  return { usd, provenance: `estimated-from-${RUNTIME_POLICY_VERSION}-price-policy` };
+}
+
+function requestConfig(maxOutputTokens = MAX_OUTPUT_TOKENS) {
+  return { model: MODEL, providerPolicyVersion: RUNTIME_POLICY_VERSION,
+    reasoning: { effort: "low" as const, exclude: false as const }, maxOutputTokens,
+    jsonMode: "prompt-only" as const };
+}
+
+async function validateLabelsChunked(dataset: Dataset, datasetId: string, cases: BenchmarkCase[], gold: GoldLabels,
+  apiKey: string, finalSelection: ValidationReport["finalSelection"]) {
+  const attempt: Attempt = 4;
+  const chunkSize = 4;
+  const partCount = Math.ceil(cases.length / chunkSize);
+  const outputCap = 16_384;
+  const phase = dataset === "heldback" ? "final" : "development";
+  const partSummaries: Array<Record<string, unknown>> = [];
+  const independent: GoldLabels = {};
+  const requestHashes: string[] = [];
+  let failed: { message: string; timedOut: boolean } | null = null;
+
+  for (let part = 0; part < partCount; part++) {
+    const chunk = cases.slice(part * chunkSize, (part + 1) * chunkSize);
+    const expected = Object.fromEntries(chunk.map(item => [item.id, gold[item.id]!])) as GoldLabels;
+    const request = buildLabelRequest(datasetId, chunk, outputCap);
+    const requestHash = hash(request);
+    const promptHash = hash({ messages: request.messages, model: request.model, provider: request.provider,
+      reasoning: request.reasoning, max_tokens: request.max_tokens });
+    requestHashes.push(requestHash);
+    const requestBytes = Buffer.byteLength(JSON.stringify(request), "utf8");
+    const reservedUsd = ((requestBytes + 8_192) * DEEPSEEK_ESTIMATE_PRICING.inputUsdPerMillion
+      + outputCap * DEEPSEEK_ESTIMATE_PRICING.outputUsdPerMillion) / 1_000_000;
+    const [reservation] = reserveCalls([{
+      kind: "fixture-label-validation", selector: MODEL, caseId: attempt4PartLedgerId(datasetId, part + 1),
+      promptHash: requestHash, reservedUsd, phase,
+    }], phase, LEDGER_PATH);
+
+    let usage: ReturnType<typeof normalizeUsage> = null;
+    let rawUsage: unknown | null = null;
+    let reportedCostUsd: number | null = null;
+    let estimatedCostUsd: number | null = null;
+    let costUsd: number | null = null;
+    let costProvenance = "failed-attempt-charged-reserved-upper-bound";
+    let provider: string | null = null;
+    let responseModel: string | null = null;
+    let generationId: string | null = null;
+    let finishReason: string | null = null;
+    let rawContent: string | null = null;
+    let httpStatus: number | null = null;
+    let httpError: ValidationReport["httpError"] = null;
+    let labels: GoldLabels | null = null;
+    let partError: string | null = null;
+    let settled = false;
+    const controller = new AbortController();
+    let timeout: ReturnType<typeof setTimeout> | undefined;
+    let hitTimeout = false;
+
+    try {
+      const requestPromise = (async () => {
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST", redirect: "error", signal: controller.signal,
+          headers: { authorization: `Bearer ${apiKey}`, "content-type": "application/json" },
+          body: JSON.stringify(request),
+        });
+        return { response, text: await response.text() };
+      })();
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        timeout = setTimeout(() => { hitTimeout = true; reject(new Error("hard-timeout")); controller.abort(); }, 180_000);
+      });
+      const { response, text: responseText } = await Promise.race([requestPromise, timeoutPromise]);
+      if (timeout) clearTimeout(timeout);
+      httpStatus = response.status;
+      let body: unknown = null;
+      try { body = JSON.parse(responseText); } catch { /* Raw model content is parsed below. */ }
+      if (!response.ok) {
+        const rootBody = isRecord(body) ? body : {};
+        const errorBody = isRecord(rootBody.error) ? rootBody.error : rootBody;
+        const metadata = isRecord(errorBody.metadata) ? errorBody.metadata : {};
+        const message = typeof errorBody.message === "string" ? errorBody.message : null;
+        const rawCode = errorBody.code;
+        const code = typeof rawCode === "string" || typeof rawCode === "number" ? rawCode : null;
+        provider = typeof errorBody.provider === "string" ? errorBody.provider
+          : typeof metadata.provider_name === "string" ? metadata.provider_name
+            : typeof rootBody.provider === "string" ? rootBody.provider : null;
+        httpError = { status: response.status,
+          message: message?.replace(/Bearer\s+\S+/gi, "Bearer [redacted]").slice(0, 500) ?? null, code, provider };
+        throw new Error(`http-${response.status}`);
+      }
+      if (!isRecord(body)) throw new Error("invalid-response-body");
+      provider = typeof body.provider === "string" ? body.provider : null;
+      responseModel = typeof body.model === "string" ? body.model : null;
+      generationId = typeof body.id === "string" ? body.id : null;
+      rawUsage = body.usage ?? null;
+      usage = normalizeUsage(body.usage);
+      const reported = isRecord(body.usage) ? body.usage.cost : undefined;
+      if (typeof reported === "number" && Number.isFinite(reported) && reported >= 0) {
+        reportedCostUsd = reported;
+        costUsd = reported;
+        costProvenance = "OpenRouter-reported-usage.cost";
+      } else {
+        const estimated = estimateFromRuntimePolicy(usage);
+        estimatedCostUsd = estimated.usd;
+        costUsd = estimated.usd;
+        costProvenance = estimated.provenance;
+      }
+      const choices = body.choices;
+      const choice = Array.isArray(choices) && isRecord(choices[0]) ? choices[0] : undefined;
+      finishReason = typeof choice?.finish_reason === "string" ? choice.finish_reason : null;
+      const message = choice && isRecord(choice.message) ? choice.message : undefined;
+      if (typeof message?.content !== "string") throw new Error("missing-json-content");
+      rawContent = message.content;
+      let payload: unknown;
+      try { payload = JSON.parse(rawContent); } catch { throw new Error("invalid-json-content"); }
+      const neutralIds = chunk.map((_, index) => neutralCaseId(index));
+      const neutral = normalizeLabels(payload, neutralIds);
+      labels = Object.fromEntries(chunk.map((item, index) => [item.id, neutral[neutralIds[index]!]!])) as GoldLabels;
+      settleCall(reservation.id, { success: true, settledUsd: costUsd, costProvenance }, LEDGER_PATH);
+      settled = true;
+    } catch (error) {
+      const message = hitTimeout ? "hard-timeout" : error instanceof Error ? error.message : "request-or-label-validation-failed";
+      partError = message === "hard-timeout" || /^http-\d+$/.test(message)
+        || ["invalid-json-content", "missing-json-content", "invalid-response-body"].includes(message)
+        ? message : "request-or-label-validation-failed";
+      if (!settled) settleCall(reservation.id, { success: false, settledUsd: costUsd,
+        costProvenance: costUsd === null ? "failed-attempt-charged-reserved-upper-bound" : costProvenance, error: partError }, LEDGER_PATH);
+    } finally {
+      if (timeout) clearTimeout(timeout);
+    }
+
+    const partNumber = part + 1;
+    const partPath = datasetPaths(dataset, 4).validation.replace(/\.json$/, `.part-${String(partNumber).padStart(2, "0")}.json`);
+    const partDisagreements = labels ? disagreements(expected, labels, chunk.map(item => item.id)) : [];
+    const partReport = {
+      version: 1, dataset, datasetId, attempt, part: partNumber, partCount, status: partError ? "error" : partDisagreements.length ? "disagreement" : "agreement",
+      validatedAt: new Date().toISOString(), requestHash, promptHash, requestConfig: requestConfig(outputCap),
+      usage, rawUsage, reportedCostUsd, estimatedCostUsd, costUsd, costProvenance,
+      provider, responseModel, generationId, finishReason, rawContent, httpStatus, httpError,
+      provisionalLabels: { datasetId, cases: expected }, independentLabels: labels, disagreements: partDisagreements,
+      ...(finalSelection ? { finalSelection } : {}), ...(partError ? { error: partError } : {}),
+    };
+    writeNewJson(partPath, partReport);
+    if (labels) Object.assign(independent, labels);
+    partSummaries.push({ part: partNumber, report: partPath.split(/[\\/]/).at(-1), status: partReport.status,
+      requestHash, usage, rawUsage, reportedCostUsd, estimatedCostUsd, costUsd, costProvenance,
+      provider, responseModel, generationId, finishReason, httpStatus, httpError, error: partError });
+
+    if (partError) {
+      failed = { message: partError, timedOut: partError === "hard-timeout" };
+      break;
+    }
+  }
+
+  const paths = datasetPaths(dataset, attempt);
+  const labelsComplete = partSummaries.length === partCount && !failed;
+  const allDisagreements = labelsComplete ? disagreements(gold, independent, cases.map(item => item.id)) : [];
+  const report: ValidationReport = {
+    version: 1, dataset, datasetId, attempt,
+    status: failed ? "error" : allDisagreements.length ? "disagreement" : "agreement",
+    validatedAt: new Date().toISOString(), model: MODEL, requestedReasoningEffort: "low", maxOutputTokens: outputCap,
+    promptHash: hash(partSummaries.map(part => part.requestHash)), requestHash: hash(requestHashes), requestConfig: requestConfig(outputCap),
+    usage: null, rawUsage: partSummaries.map(part => (part as Record<string, unknown>).rawUsage),
+    reportedCostUsd: null, estimatedCostUsd: null, costUsd: null, costProvenance: "see per-part reports and ledger reservations",
+    provider: null, responseModel: null, generationId: null, finishReason: null, rawContent: null,
+    provisionalLabels: { datasetId, cases: gold }, independentLabels: labelsComplete ? independent : null,
+    disagreements: allDisagreements, parts: partSummaries,
+    ...(Object.keys(independent).length ? { partialIndependentLabels: independent } : {}),
+    ...(finalSelection ? { finalSelection } : {}), ...(failed ? { error: failed.message } : {}),
+  };
+  writeNewJson(paths.validation, report);
+  if (failed?.timedOut) {
+    process.stderr.write("Label validation timed out; attempt 4 is saved and will not be retried automatically.\n");
+    process.exit(1);
+  }
+  return { validation: report, frozenPath: null };
+}
+
+async function validateLabels(dataset: Dataset, final: boolean, attempt: Attempt) {
   let finalSelection: ValidationReport["finalSelection"];
   if (dataset === "heldback") {
     if (!final) throw new Error("Held-back validation requires the explicit --final flag.");
     finalSelection = requireFinalSelection();
   } else assertDevelopmentOpen();
 
-  const paths = datasetPaths(dataset);
+  const paths = datasetPaths(dataset, attempt);
   if (existsSync(paths.validation) || existsSync(paths.frozen)) {
-    throw new Error("This dataset already has a validation report or frozen labels; no second paid label-validation attempt will run.");
+    throw new Error(`Attempt ${attempt} already has a validation report or frozen labels; attempts are immutable.`);
   }
   const { datasetId, cases, gold } = validateDataset(readJson(paths.cases), readJson(paths.labels));
-  if (existingAttempt(datasetId)) throw new Error("The spend ledger already records a label-validation attempt for this dataset; no retry will be launched.");
+  if (attempt > 1) {
+    const previousAttempt = (attempt - 1) as Attempt;
+    const previousPath = datasetPaths(dataset, previousAttempt).validation;
+    const previousReport = existsSync(previousPath) ? readJson(previousPath) : null;
+    if (!isRecord(previousReport) || previousReport.status !== "error" || !existingAttempt(datasetId, previousAttempt)) {
+      throw new Error(`Attempt ${attempt} is permitted only after an immutable failed attempt ${previousAttempt} report and ledger entry.`);
+    }
+  }
+  if (attempt === 4 ? hasAttempt4Ledger(datasetId) : existingAttempt(datasetId, attempt)) {
+    throw new Error(`The spend ledger already records attempt ${attempt}; no retry will be launched.`);
+  }
   const apiKey = readOpenRouterKey();
+  if (attempt === 4) return validateLabelsChunked(dataset, datasetId, cases, gold, apiKey, finalSelection);
   const request = buildLabelRequest(datasetId, cases);
-  const promptHash = hash({ model: request.model, messages: request.messages, reasoning: request.reasoning,
-    max_tokens: request.max_tokens, response_format: request.response_format });
   const requestHash = hash(request);
+  const promptHash = hash({ messages: request.messages, model: request.model, provider: request.provider,
+    reasoning: request.reasoning, max_tokens: request.max_tokens });
   const requestBytes = Buffer.byteLength(JSON.stringify(request), "utf8");
   const phase = dataset === "heldback" ? "final" : "development";
-  const reservedUsd = reservationUpperBound("subagent", requestBytes, MAX_OUTPUT_TOKENS);
+  const reservedUsd = ((requestBytes + 8_192) * DEEPSEEK_ESTIMATE_PRICING.inputUsdPerMillion
+    + MAX_OUTPUT_TOKENS * DEEPSEEK_ESTIMATE_PRICING.outputUsdPerMillion) / 1_000_000;
   const [reservation] = reserveCalls([{
-    kind: "fixture-label-validation", selector: MODEL, caseId: datasetId, promptHash, reservedUsd, phase,
+    kind: "fixture-label-validation", selector: MODEL, caseId: attemptLedgerId(datasetId, attempt), promptHash: requestHash, reservedUsd, phase,
   }], phase, LEDGER_PATH);
 
   let usage: ReturnType<typeof normalizeUsage> = null;
+  let rawUsage: unknown | null = null;
+  let reportedCostUsd: number | null = null;
+  let estimatedCostUsd: number | null = null;
   let costUsd: number | null = null;
   let costProvenance = "failed-attempt-charged-reserved-upper-bound";
+  let provider: string | null = null;
+  let responseModel: string | null = null;
+  let generationId: string | null = null;
+  let finishReason: string | null = null;
+  let rawContent: string | null = null;
+  let httpStatus: number | null = null;
+  let httpError: ValidationReport["httpError"] = null;
   let settled = false;
   try {
     const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -247,50 +493,82 @@ async function validateLabels(dataset: Dataset, final: boolean) {
       headers: { authorization: `Bearer ${apiKey}`, "content-type": "application/json" },
       body: JSON.stringify(request),
     });
-    if (!response.ok) throw new Error(`http-${response.status}`);
+    httpStatus = response.status;
+    if (!response.ok) {
+      let failureBody: unknown;
+      try { failureBody = JSON.parse(await response.text()); } catch { failureBody = null; }
+      const rootBody = isRecord(failureBody) ? failureBody : {};
+      const errorBody = isRecord(rootBody.error) ? rootBody.error : rootBody;
+      const metadata = isRecord(errorBody.metadata) ? errorBody.metadata : {};
+      const message = typeof errorBody.message === "string" ? errorBody.message : null;
+      const rawCode = errorBody.code;
+      const code = typeof rawCode === "string" || typeof rawCode === "number" ? rawCode : null;
+      const bodyProvider = typeof errorBody.provider === "string" ? errorBody.provider
+        : typeof metadata.provider_name === "string" ? metadata.provider_name
+          : typeof rootBody.provider === "string" ? rootBody.provider : null;
+      httpError = { status: response.status, message: message?.replace(/Bearer\s+\S+/gi, "Bearer [redacted]").slice(0, 500) ?? null, code, provider: bodyProvider };
+      provider = bodyProvider;
+      throw new Error(`http-${response.status}`);
+    }
     const body: unknown = await response.json();
     if (!isRecord(body)) throw new Error("invalid-response-body");
+    provider = typeof body.provider === "string" ? body.provider : null;
+    responseModel = typeof body.model === "string" ? body.model : null;
+    generationId = typeof body.id === "string" ? body.id : null;
+    rawUsage = body.usage ?? null;
     usage = normalizeUsage(body.usage);
     const reportedCost = isRecord(body.usage) ? body.usage.cost : undefined;
     if (typeof reportedCost === "number" && Number.isFinite(reportedCost) && reportedCost >= 0) {
+      reportedCostUsd = reportedCost;
       costUsd = reportedCost;
       costProvenance = "OpenRouter-reported-usage.cost";
     } else {
-      const estimated = computedCost("subagent", usage);
+      const estimated = estimateFromRuntimePolicy(usage);
+      estimatedCostUsd = estimated.usd;
       costUsd = estimated.usd;
       costProvenance = estimated.provenance;
     }
     const choices = body.choices;
-    const message = Array.isArray(choices) && isRecord(choices[0]) && isRecord(choices[0].message) ? choices[0].message : undefined;
+    const choice = Array.isArray(choices) && isRecord(choices[0]) ? choices[0] : undefined;
+    finishReason = typeof choice?.finish_reason === "string" ? choice.finish_reason : null;
+    const message = choice && isRecord(choice.message) ? choice.message : undefined;
     if (typeof message?.content !== "string") throw new Error("missing-json-content");
+    rawContent = message.content;
     const neutralIds = cases.map((_, index) => neutralCaseId(index));
-    const neutralLabels = normalizeLabels(JSON.parse(message.content), neutralIds);
+    let parsed: unknown;
+    try { parsed = JSON.parse(message.content); } catch { throw new Error("invalid-json-content"); }
+    const neutralLabels = normalizeLabels(parsed, neutralIds);
     const labels = Object.fromEntries(cases.map((item, index) => [item.id, neutralLabels[neutralIds[index]!]!])) as GoldLabels;
     const differences = disagreements(gold, labels, cases.map(item => item.id));
     settleCall(reservation.id, { success: true, settledUsd: costUsd, costProvenance }, LEDGER_PATH);
     settled = true;
     const validation: ValidationReport = {
-      version: 1, dataset, datasetId, status: differences.length ? "disagreement" : "agreement",
+      version: 1, dataset, datasetId, attempt, status: differences.length ? "disagreement" : "agreement",
       validatedAt: new Date().toISOString(), model: MODEL, requestedReasoningEffort: "low", maxOutputTokens: MAX_OUTPUT_TOKENS,
-      promptHash, requestHash, usage, estimatedCostUsd: costUsd, costProvenance,
+      promptHash, requestHash, requestConfig: requestConfig(), usage, rawUsage, reportedCostUsd, estimatedCostUsd, costUsd, costProvenance,
+      provider, responseModel, generationId, finishReason, rawContent,
       provisionalLabels: { datasetId, cases: gold }, independentLabels: labels, disagreements: differences,
       ...(finalSelection ? { finalSelection } : {}),
     };
     writeNewJson(paths.validation, validation);
-    const frozenPath = differences.length ? null : freezeLabels(dataset, datasetId, readJson(paths.labels) as Record<string, unknown>, validation);
-    return { validation, frozenPath };
+    return { validation, frozenPath: null };
   } catch (error) {
-    const failure = error instanceof Error && /^http-\d+$/.test(error.message) ? error.message : "request-or-label-validation-failed";
+    const failure = error instanceof Error && (/^http-\d+$/.test(error.message)
+      || ["invalid-json-content", "missing-json-content", "invalid-response-body"].includes(error.message))
+      ? error.message : "request-or-label-validation-failed";
     if (!settled) {
       settleCall(reservation.id, { success: false, settledUsd: costUsd,
         costProvenance: costUsd === null ? "failed-attempt-charged-reserved-upper-bound" : costProvenance, error: failure }, LEDGER_PATH);
     }
     if (!existsSync(paths.validation)) {
       const report: ValidationReport = {
-        version: 1, dataset, datasetId, status: "error", validatedAt: new Date().toISOString(), model: MODEL,
+        version: 1, dataset, datasetId, attempt, status: "error", validatedAt: new Date().toISOString(), model: MODEL,
         requestedReasoningEffort: "low", maxOutputTokens: MAX_OUTPUT_TOKENS, promptHash, requestHash,
-        usage, estimatedCostUsd: costUsd, costProvenance, provisionalLabels: { datasetId, cases: gold },
+        requestConfig: requestConfig(), usage, rawUsage, reportedCostUsd, estimatedCostUsd, costUsd, costProvenance,
+        provider, responseModel, generationId, finishReason, rawContent,
+        provisionalLabels: { datasetId, cases: gold },
         independentLabels: null, disagreements: [], ...(finalSelection ? { finalSelection } : {}), error: failure,
+        httpStatus, httpError,
       };
       writeNewJson(paths.validation, report);
     }
@@ -298,13 +576,13 @@ async function validateLabels(dataset: Dataset, final: boolean) {
   }
 }
 
-function freezeExistingLabels(dataset: Dataset, final: boolean, acceptReviewedDisagreements: boolean, resolutionNote?: string) {
+function freezeExistingLabels(dataset: Dataset, final: boolean, attempt: Attempt, acceptReviewedDisagreements: boolean, resolutionNote?: string) {
   let finalSelection: ValidationReport["finalSelection"];
   if (dataset === "heldback") {
     if (!final) throw new Error("Held-back freezing requires the explicit --final flag.");
     finalSelection = requireFinalSelection();
   } else assertDevelopmentOpen();
-  const paths = datasetPaths(dataset);
+  const paths = datasetPaths(dataset, attempt);
   if (existsSync(paths.frozen)) throw new Error(`Frozen labels already exist at ${paths.frozen}; they will not be overwritten.`);
   const validation = readJson(paths.validation) as ValidationReport;
   const labels = readJson(paths.labels);
@@ -323,7 +601,9 @@ function freezeExistingLabels(dataset: Dataset, final: boolean, acceptReviewedDi
   if (currentDisagreements.length && (!acceptReviewedDisagreements || !note)) {
     throw new Error("Resolve the independent-label differences or provide --accept-reviewed-disagreements with a nonempty --note after human review.");
   }
-  const frozenPath = freezeLabels(dataset, String(validation.datasetId), labels, validation, currentDisagreements.length ? note : undefined);
+  if (validation.attempt !== attempt) throw new Error("Selected report does not match the requested attempt.");
+  if (validation.status === "error") throw new Error("A failed validation attempt cannot be frozen.");
+  const frozenPath = freezeLabels(dataset, String(validation.datasetId), attempt, labels, validation, currentDisagreements.length ? note : undefined);
   return { frozenPath, disagreementsAfterResolution: currentDisagreements };
 }
 
@@ -333,9 +613,14 @@ function parseArgs(args: string[]) {
   const final = args.includes("--final");
   const acceptReviewedDisagreements = args.includes("--accept-reviewed-disagreements");
   let note: string | undefined;
+  let attempt: Attempt | undefined;
   for (let index = 2; index < args.length; index++) {
     const arg = args[index];
     if (arg === "--final" || arg === "--accept-reviewed-disagreements") continue;
+    if (arg === "--attempt" && attempt === undefined && ["1", "2", "3", "4"].includes(args[index + 1] ?? "")) {
+      attempt = Number(args[++index]) as Attempt;
+      continue;
+    }
     if (arg === "--note" && !note && args[index + 1] && !args[index + 1]!.startsWith("--")) {
       note = args[++index];
       continue;
@@ -343,26 +628,31 @@ function parseArgs(args: string[]) {
     throw new Error("Unknown or incomplete benchmark-labels option: " + arg);
   }
   if (!(dataset === "development" || dataset === "heldback") || !(command === "validate" || command === "freeze")) {
-    throw new Error("Use: benchmark-labels.ts validate development|heldback [--final], or freeze development|heldback [--final] [--accept-reviewed-disagreements --note <reason>].");
+    throw new Error("Use: benchmark-labels.ts validate development|heldback [--final] [--attempt 1|2|3|4], or freeze development|heldback --attempt 1|2|3|4 [--final] [--accept-reviewed-disagreements --note <reason>].");
   }
   if (acceptReviewedDisagreements && !note?.trim()) throw new Error("Manual disagreement acceptance requires a nonempty --note.");
   if (note && !acceptReviewedDisagreements) throw new Error("Use --note with --accept-reviewed-disagreements.");
   if (final && dataset !== "heldback") throw new Error("The --final flag is only valid for held-back labels.");
   if ((acceptReviewedDisagreements || note) && command !== "freeze") throw new Error("Manual disagreement options are only valid with freeze.");
-  return { command, dataset, final, acceptReviewedDisagreements, note } as const;
+  if (command === "freeze" && attempt === undefined) throw new Error("Choose the successful report explicitly with --attempt 1|2|3|4.");
+  return { command, dataset, final, attempt, acceptReviewedDisagreements, note } as const;
 }
 
 export async function main(args = process.argv.slice(2)) {
   const options = parseArgs(args);
   if (options.command === "validate") {
-    const { validation, frozenPath } = await validateLabels(options.dataset, options.final);
-    console.log(JSON.stringify({ status: validation.status, dataset: options.dataset, report: reportPath(options.dataset),
-      frozenLabels: frozenPath, disagreements: validation.disagreements.length, estimatedCostUsd: validation.estimatedCostUsd,
+    const attempt = options.attempt ?? 1;
+    const { validation, frozenPath } = await validateLabels(options.dataset, options.final, attempt);
+    console.log(JSON.stringify({ status: validation.status, dataset: options.dataset, attempt, report: reportPath(options.dataset, attempt),
+      frozenLabels: frozenPath, disagreements: validation.disagreements.length, costUsd: validation.costUsd,
+      reportedCostUsd: validation.reportedCostUsd, estimatedCostUsd: validation.estimatedCostUsd,
       costProvenance: validation.costProvenance }, null, 2));
-    if (validation.status === "disagreement") process.exitCode = 2;
+    if (validation.status === "error") process.exitCode = 1;
+    else if (validation.status === "disagreement") process.exitCode = 2;
   } else {
-    const result = freezeExistingLabels(options.dataset, options.final, options.acceptReviewedDisagreements, options.note);
-    console.log(JSON.stringify({ frozenLabels: result.frozenPath, disagreementsAfterResolution: result.disagreementsAfterResolution.length }, null, 2));
+    const result = freezeExistingLabels(options.dataset, options.final, options.attempt!, options.acceptReviewedDisagreements, options.note);
+    console.log(JSON.stringify({ attempt: options.attempt, frozenLabels: result.frozenPath,
+      disagreementsAfterResolution: result.disagreementsAfterResolution.length }, null, 2));
   }
 }
 

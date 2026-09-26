@@ -1,6 +1,6 @@
 # Grail selector benchmark
 
-This is the small selector-only synthetic benchmark from `PLAN.md`. It runs the Jev selector against the generic DeepSeek control through the production Pi extension; it does not run workers or reviewers. Calls are serial and paired on the same case packet. A `$1.00` ledger reserves `$0.20` for final evaluation, reserves estimated maximum cost before dispatch, records failed attempts, and never retries a failed request automatically.
+This is the small selector-only synthetic benchmark from `PLAN.md`. It runs the Jev selector against the generic DeepSeek control through the production Pi extension; it does not run workers or reviewers. Calls are serial and paired on the same case packet. The user-authorized `$10.00` overall ledger reserves `$0.20` for final evaluation, reserves estimated maximum cost before dispatch, records failed attempts, and never retries a failed request automatically. This is not an additional $10 allowance for each benchmark phase.
 
 ## Commands
 

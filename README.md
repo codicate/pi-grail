@@ -93,7 +93,7 @@ control results are marked historical; final comparisons use fresh calls.
 Results under benchmarks/results/<iteration-id>/ retain packets, labels,
 prompts, hashes, individual outcomes, usage, costs, timing, and tuning notes.
 The run ledger reserves estimated bounds before paid calls, retains uncertain
-charges for failed attempts, enforces a $1 ceiling, and reserves $0.20 for final
+charges for failed attempts, enforces the user-authorized $10 overall ceiling, and reserves $0.20 for final
 validation. See [benchmarks/README.md](benchmarks/README.md) for commands.
 
 Shared preparation, A/B gates, live workers/reviewers, and label validation are
@@ -102,7 +102,7 @@ usage is known zero. Reasoning tokens are a subset of output, never added twice.
 Pi-derived or price-derived costs are estimates when billed cost is unavailable.
 OpenRouter calls use a fixed price ceiling without automatic provider fallback.
 Estimates use that ceiling without assuming cache discounts, not the
-OpenRouter model listing's cheapest available route. The selector has a 2,048
+OpenRouter model listing's cheapest available route. The selector has an 8,192
 output-token cap including reasoning; label validation has a separate cap.
 The delegation DTO omits reasoning counts; native child telemetry supplements
 it where available, without treating absent values as measured zeros.

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "ceilingUsd": 1,
+  "ceilingUsd": 10,
   "finalReserveUsd": 0.2,
   "openedAt": "2026-09-26T19:59:31.085Z",
   "calls": [

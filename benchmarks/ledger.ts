@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { randomUUID } from "node:crypto";
 
 export const LEDGER_PATH = join(process.cwd(), "benchmarks/state/spend-ledger.json");
-export const TOTAL_LIMIT_USD = 1;
+export const TOTAL_LIMIT_USD = 10;
 export const FINAL_RESERVE_USD = 0.2;
 
 export type BudgetPhase = "development" | "final";
@@ -42,7 +42,7 @@ function readLedger(path = LEDGER_PATH): SpendLedger {
   if (!value || typeof value !== "object") throw new Error("Spend ledger is invalid.");
   const ledger = value as SpendLedger;
   if (ledger.version !== 1 || ledger.ceilingUsd !== TOTAL_LIMIT_USD || ledger.finalReserveUsd !== FINAL_RESERVE_USD
-    || !Array.isArray(ledger.calls)) throw new Error("Spend ledger version or limits do not match the approved $1 budget.");
+    || !Array.isArray(ledger.calls)) throw new Error("Spend ledger version or limits do not match the approved $10 budget.");
   return ledger;
 }
 

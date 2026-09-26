@@ -1,7 +1,7 @@
 // Let OpenRouter select an available route within a fixed price ceiling.
 // A pinned DeepSeek route returned HTTP 404; no automatic provider fallback.
-export const RUNTIME_POLICY_VERSION = "bounded-routing-low-v2";
-export const SELECTOR_OUTPUT_TOKENS = 2048;
+export const RUNTIME_POLICY_VERSION = "bounded-routing-low-v3-generous-output";
+export const SELECTOR_OUTPUT_TOKENS = 8192;
 export const OPENROUTER_PROVIDER_POLICY = {
   allow_fallbacks: false,
   max_price: { prompt: 0.3, completion: 1.2 },

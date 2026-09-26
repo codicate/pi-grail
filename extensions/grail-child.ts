@@ -53,8 +53,8 @@ function setLimit(runtime: LiveLaunchRuntime, reason: string, ctx: { abort(): vo
 function maxTokens(runtime: LiveLaunchRuntime) {
   switch (runtime.envelope.role) {
     case "grail-selector": return SELECTOR_OUTPUT_TOKENS;
-    case "grail-reviewer": return 512;
-    case "grail-worker": return 1024;
+    case "grail-reviewer": return 4096;
+    case "grail-worker": return 8192;
   }
 }
 

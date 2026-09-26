@@ -12,7 +12,7 @@ Success means Jev matches or exceeds the generic LLM gate’s decision correctne
 - Keep the control basic; concentrate development and tuning effort on Jev.
 - Implement live hooks, but do not run E2E benchmarks.
 - No verify-everything/verify-nothing arms, Sol judging, or reviewer calls inside Type 1.
-- Total paid-API budget: $1, including fixture validation and live smoke calls. Codex implementation-agent usage is separate.
+- Total paid-API budget: $10 overall (updated by user clarification), including fixture validation and live smoke calls. Codex implementation-agent usage is separate.
 - First execution step: save this plan as PLAN.md (completed by creating this file).
 
 ## 2. Implementation
@@ -102,7 +102,7 @@ This becomes a tuned Jev versus frozen control comparison, not a claim of prompt
 
 Cache control results using the dataset, labels, control prompt, shared packing/scoring logic, runtime versions, model/effort, and limits. Jev-only changes can reuse them. Shared changes or legitimate benchmark corrections invalidate affected controls. Mark reused results as historical; final validation uses fresh calls.
 
-Stop on success, two consecutive non-improving candidates, five candidate versions, or the $1 ceiling. Reserve $0.20 for final validation. Reserve bounded estimated call cost before launching; count failed attempts and do not automatically retry or switch arms. Report unmet goals honestly.
+Stop on success, two consecutive non-improving candidates, five candidate versions, or the $10 overall ceiling. Reserve $0.20 for final validation. Reserve bounded estimated call cost before launching; count failed attempts and do not automatically retry or switch arms. Report unmet goals honestly.
 
 ## 5. Parallel work, checkpoints, and acceptance
 
@@ -137,13 +137,16 @@ do not execute either E2E arm yet. Both arms use identical isolated starting
 files, historical memory, worker settings, and shared reviewer. Record actual
 visible signals rather than assuming stale memory must trigger a gate. The
 checker grades its narrow heartbeat contract, not real-world lease robustness.
-The user authorized up to most of $10 of DeepSeek credit; retain the tighter
-$1 Type-1 ceiling because the current experiment does not need more.
+The user clarified that the overall paid budget is $10, superseding the original
+$1 Type-1 restriction; do not impose a separate $1 ceiling. Prior failed-call
+charges and reservations remain in that same ledger.
 
 Runtime correction before baselines: apply an OpenRouter route-price ceiling,
 disable provider fallback, and reserve using that ceiling without assuming cache
 discounts. A trial pinned DeepSeek route returned HTTP 404 and was removed before
 baseline execution. Pi catalog-derived cost is an estimate, not billed cost. Give the generic
-selector 2,048 output tokens including reasoning. Preserve the failed first
+selector 8,192 output tokens including reasoning, validation 16,384, worker 8,192,
+and reviewer 4,096. These are generous safety ceilings, not desired output lengths.
+Keep response/checkpoint caps and the Jev/shared-input packet limit unchanged. Preserve the failed first
 label-validation attempt; any corrected validation attempt must be explicit,
 separately recorded, and charged to the same ledger.
